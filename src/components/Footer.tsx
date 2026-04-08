@@ -7,14 +7,14 @@ export const Footer = () => {
         
         {/* Enlaces Legales */}
         <nav className="flex flex-wrap justify-center gap-3 md:gap-6 text-[11px] md:text-sm">
+          <Link to="/aviso-legal" className="hover:text-gray-300 transition-colors">
+            Aviso Legal
+          </Link>
           <Link to="/privacidad" className="hover:text-gray-300 transition-colors">
             Política de Privacidad
           </Link>
           <Link to="/cookies" className="hover:text-gray-300 transition-colors">
             Política de Cookies
-          </Link>
-          <Link to="/terminos" className="hover:text-gray-300 transition-colors">
-            Términos y Condiciones
           </Link>
         </nav>
 
@@ -27,7 +27,7 @@ export const Footer = () => {
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
           <img src="/Img/insta.png" alt="Instagram" className="w-5 h-5 md:w-6 md:h-6" />
-          <span className="font-medium text-xs md:text-base">&copy; 2019 Gastro-Bar Fogón</span>
+          <span className="font-medium text-xs md:text-base">&copy;Gastro-Bar Fogón</span>
         </a>
       </div>
     </footer>

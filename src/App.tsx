@@ -1,6 +1,10 @@
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
 import { Routes, Route, Link } from 'react-router-dom';
+import { Conocenos } from './components/Conocenos';
+import { AvisoLegal } from './components/AvisoLegal';
+import { Privacidad } from './components/Privacidad';
+import { Cookies } from './components/Cookies';
 
 const Home = () => {
   return (
@@ -49,7 +53,7 @@ const Home = () => {
       </section>
 
       {/* Cita Final o Separador */}
-      <section className="bg-[#30312E] py-12 text-center text-[#D3CCBC]">
+      <section className="bg-[#30312E] py-8 text-center text-[#D3CCBC]">
         <p className="text-2xl italic">"Más que un restaurante, un fogón compartido"</p>
       </section>
     </main>
@@ -59,7 +63,6 @@ const Home = () => {
 // Componentes temporales para las demás páginas
 const Carta = () => <div className="flex-1 flex items-center justify-center text-4xl text-[#30312E]">Página de la Carta (En construcción)</div>;
 const Reservar = () => <div className="flex-1 flex items-center justify-center text-4xl text-[#30312E]">Página de Reservas (En construcción)</div>;
-const Conocenos = () => <div className="flex-1 flex items-center justify-center text-4xl text-[#30312E]">Página Conócenos (En construcción)</div>;
 
 function App() {
   return (
@@ -72,6 +75,9 @@ function App() {
         <Route path="/carta" element={<Carta />} />
         <Route path="/reservar" element={<Reservar />} />
         <Route path="/conocenos" element={<Conocenos />} />
+        <Route path="/aviso-legal" element={<AvisoLegal />} />
+        <Route path="/privacidad" element={<Privacidad />} />
+        <Route path="/cookies" element={<Cookies />} />
       </Routes>
 
       <Footer />
