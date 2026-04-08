@@ -54,7 +54,7 @@ export const Conocenos = () => {
                 <span>Viernes y Sábados</span>
                 <div className="text-right">
                   <p>13:30 - 16:00</p>
-                  <p>20:00 - 23:00</p>
+                  <p>20:30 - 23:00</p>
                 </div>
               </div>
               <div className="flex justify-between border-b border-[#D3CCBC]/10 pb-2">

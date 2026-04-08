@@ -5,6 +5,7 @@ import { Conocenos } from './components/Conocenos';
 import { AvisoLegal } from './components/AvisoLegal';
 import { Privacidad } from './components/Privacidad';
 import { Cookies } from './components/Cookies';
+import Carta from './components/Carta';
 
 const Home = () => {
   return (
@@ -61,7 +62,6 @@ const Home = () => {
 };
 
 // Componentes temporales para las demás páginas
-const Carta = () => <div className="flex-1 flex items-center justify-center text-4xl text-[#30312E]">Página de la Carta (En construcción)</div>;
 const Reservar = () => <div className="flex-1 flex items-center justify-center text-4xl text-[#30312E]">Página de Reservas (En construcción)</div>;
 
 function App() {
