@@ -56,7 +56,15 @@ const Carta: React.FC = () => {
         
         {/* Tabs */}
         <div className="flex justify-center gap-4 mb-16">
-          {(['carta', 'vinos', 'especial'] as const).map((tab) => (
+          {(['carta', 'vinos', 'especial'] as const)
+            .filter(tab => {
+              if (tab === 'especial') {
+                const hidden = localStorage.getItem('hideSpecials') === 'true';
+                return !hidden;
+              }
+              return true;
+            })
+            .map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}

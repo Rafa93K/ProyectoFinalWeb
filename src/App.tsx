@@ -6,6 +6,13 @@ import { AvisoLegal } from './components/AvisoLegal';
 import { Privacidad } from './components/Privacidad';
 import { Cookies } from './components/Cookies';
 import Carta from './components/Carta';
+import PanelAdmin from './components/AdminPanel';
+import LoginNav from './components/LoginNav';
+import Registro from './components/Registro';
+import Login from './components/Login';
+
+
+
 
 const Home = () => {
   return (
@@ -68,6 +75,8 @@ function App() {
   return (
     <div className="min-h-screen bg-[#D3CCBC] flex flex-col font-serif">
       <Header />
+      <LoginNav />
+
       
       <Routes>
         <Route path="/" element={<Home />} />
@@ -78,7 +87,13 @@ function App() {
         <Route path="/aviso-legal" element={<AvisoLegal />} />
         <Route path="/privacidad" element={<Privacidad />} />
         <Route path="/cookies" element={<Cookies />} />
+        <Route path="/admin" element={<PanelAdmin />} />
+        <Route path="/registro" element={<Registro />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
+
+
+
 
       <Footer />
     </div>
