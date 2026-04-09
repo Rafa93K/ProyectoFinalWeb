@@ -22,8 +22,7 @@ const Carta: React.FC = () => {
   const fetchProductos = async (tipo: string) => {
     setLoading(true);
     try {
-      // Ajusta esta URL según donde esté alojado tu backend PHP
-      const response = await fetch(`http://localhost/proyectoWeb/backend/getProductos.php?tipo=${tipo}`);
+      const response = await fetch(`https://rafa.cicloflorenciopintado.es/getProductos.php?tipo=${tipo}`);
       const data = await response.json();
       console.log('Productos cargados:', data);
       setProductos(Array.isArray(data) ? data : []);
@@ -33,6 +32,15 @@ const Carta: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Función auxiliar para obtener la ruta correcta de la imagen
+  const getImagePath = (imagen: string) => {
+    if (!imagen) return '/Img/default.jpg';
+    // Si ya es una URL completa, la dejamos tal cual
+    if (imagen.startsWith('https')) return imagen;
+    
+    return `https://rafa.cicloflorenciopintado.es/Img/${imagen}`;
   };
 
   const groupByType = () => {
@@ -99,7 +107,7 @@ const Carta: React.FC = () => {
                     <div key={item.id_producto} className="flex gap-4 md:gap-6 bg-white/40 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
                       <div className="w-24 h-24 md:w-32 md:h-32 shrink-0 overflow-hidden rounded-xl bg-white/20">
                         <img 
-                          src={item.imagen || '/Img/default.jpg'} 
+                          src={getImagePath(item.imagen)} 
                           alt={item.nombre} 
                           className="w-full h-full object-cover"
                           onError={(e) => {
