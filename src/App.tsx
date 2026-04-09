@@ -76,8 +76,6 @@ function App() {
     <div className="min-h-screen bg-[#D3CCBC] flex flex-col font-serif">
       <Header />
       <LoginNav />
-
-      
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
@@ -91,10 +89,6 @@ function App() {
         <Route path="/registro" element={<Registro />} />
         <Route path="/login" element={<Login />} />
       </Routes>
-
-
-
-
       <Footer />
     </div>
   )
