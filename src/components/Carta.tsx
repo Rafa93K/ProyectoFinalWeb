@@ -14,10 +14,24 @@ const Carta: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'carta' | 'vinos' | 'especial'>('carta');
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mostrarEspeciales, setMostrarEspeciales] = useState(true);
 
   useEffect(() => {
     fetchProductos(activeTab);
+    fetchConfig();
   }, [activeTab]);
+
+  const fetchConfig = async () => {
+    try {
+      const response = await fetch('http://rafa.cicloflorenciopintado.es/getAdminConfig.php');
+      const data = await response.json();
+      if (data.success) {
+        setMostrarEspeciales(data.especials === 1 || data.especials === true);
+      }
+    } catch (error) {
+      console.error('Error fetching config:', error);
+    }
+  };
 
   const fetchProductos = async (tipo: string) => {
     setLoading(true);
@@ -67,8 +81,7 @@ const Carta: React.FC = () => {
           {(['carta', 'vinos', 'especial'] as const)
             .filter(tab => {
               if (tab === 'especial') {
-                const hidden = localStorage.getItem('hideSpecials') === 'true';
-                return !hidden;
+                return mostrarEspeciales;
               }
               return true;
             })

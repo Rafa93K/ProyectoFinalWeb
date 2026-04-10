@@ -7,6 +7,7 @@ import { Privacidad } from './components/Privacidad';
 import { Cookies } from './components/Cookies';
 import Carta from './components/Carta';
 import PanelAdmin from './components/AdminPanel';
+import AdminLogin from './components/AdminLogin';
 import LoginNav from './components/LoginNav';
 import Registro from './components/Registro';
 import Login from './components/Login';
@@ -85,7 +86,10 @@ function App() {
         <Route path="/aviso-legal" element={<AvisoLegal />} />
         <Route path="/privacidad" element={<Privacidad />} />
         <Route path="/cookies" element={<Cookies />} />
-        <Route path="/admin" element={<PanelAdmin />} />
+        <Route path="/admin" element={
+          localStorage.getItem('adminSesion') ? <PanelAdmin /> : <AdminLogin />
+        } />
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/login" element={<Login />} />
       </Routes>

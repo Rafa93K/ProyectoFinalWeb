@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * Interfaz que define la estructura de un Producto
@@ -14,6 +15,9 @@ interface Producto {
 }
 
 const PanelAdmin: React.FC = () => {
+  const navegar = useNavigate();
+  const [adminNombre, setAdminNombre] = useState('Admin');
+
   // --- ESTADOS DEL COMPONENTE ---
   const [listaProductos, setListaProductos] = useState<Producto[]>([]); // Almacena los productos de la BD
   const [cargando, setCargando] = useState(true); // Controla el indicador de carga
@@ -35,14 +39,39 @@ const PanelAdmin: React.FC = () => {
    * Efecto inicial al montar el componente
    */
   useEffect(() => {
-    obtenerProductos();
-    
-    // Recuperamos la configuración del interruptor de especiales desde el almacenamiento local
-    const toggleGuardado = localStorage.getItem('hideSpecials');
-    if (toggleGuardado !== null) {
-      setMostrarEspeciales(toggleGuardado === 'false');
+    // Verificar si hay sesión de admin
+    const sesion = localStorage.getItem('adminSesion');
+    if (!sesion) {
+      navegar('/admin/login');
+      return;
     }
-  }, []);
+    const datosSesion = JSON.parse(sesion);
+    setAdminNombre(datosSesion.nombre);
+
+    obtenerProductos();
+    obtenerConfigAdmin();
+  }, [navegar]);
+
+  /**
+   * Obtiene la configuración del administrador (visualización de especiales)
+   */
+  const obtenerConfigAdmin = async () => {
+    try {
+      const respuesta = await fetch('http://rafa.cicloflorenciopintado.es/getAdminConfig.php');
+      const datos = await respuesta.json();
+      if (datos.success) {
+        setMostrarEspeciales(datos.especials === 1 || datos.especials === true);
+      }
+    } catch (error) {
+      console.error('Error al obtener configuración:', error);
+    }
+  };
+
+  const cerrarSesion = () => {
+    localStorage.removeItem('adminSesion');
+    navegar('/admin/login');
+    window.location.reload();
+  };
 
   /**
    * Función para obtener todos los productos del servidor
@@ -57,7 +86,7 @@ const PanelAdmin: React.FC = () => {
       */
       
       // Realizamos la petición (sustituir URL por la real en producción)
-      const respuesta = await fetch('http://localhost/proyectoWeb/backend/getProductos.php?tipo=all');
+      const respuesta = await fetch('http://rafa.cicloflorenciopintado.es/getProductos.php?tipo=all');
       const datos = await respuesta.json();
       setListaProductos(Array.isArray(datos) ? datos : []);
     } catch (error) {
@@ -70,18 +99,30 @@ const PanelAdmin: React.FC = () => {
   /**
    * Maneja el interruptor para ocultar/mostrar especiales en la carta
    */
-  const alternarEspeciales = () => {
+  const alternarEspeciales = async () => {
     const nuevoEstado = !mostrarEspeciales;
-    setMostrarEspeciales(nuevoEstado);
     
-    // Guardamos la preferencia en localStorage para que Carta.tsx pueda leerla
-    localStorage.setItem('hideSpecials', (!nuevoEstado).toString());
-    
-    /* 
-       CONEXIÓN CON BASE DE DATOS:
-       Aquí enviarías una petición POST para actualizar este ajuste en la tabla de configuración.
-    */
-    alert(`Sección de Especiales: ${nuevoEstado ? 'Visible' : 'Oculta'}`);
+    try {
+      const formData = new FormData();
+      formData.append('especials', nuevoEstado ? '1' : '0');
+
+      const respuesta = await fetch('http://rafa.cicloflorenciopintado.es/actualizarConfigAdmin.php', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const resultado = await respuesta.json();
+
+      if (resultado.success) {
+        setMostrarEspeciales(nuevoEstado);
+        alert(`Sección de Especiales: ${nuevoEstado ? 'Visible' : 'Oculta'} (Actualizado en BD)`);
+      } else {
+        alert('Error al actualizar en la base de datos');
+      }
+    } catch (error) {
+      console.error('Error al sincronizar con el servidor:', error);
+      alert('Error de conexión');
+    }
   };
 
   /**
@@ -209,9 +250,21 @@ const PanelAdmin: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         {/* CABECERA DEL PANEL */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-          <div>
-            <h1 className="text-4xl font-bold text-stone-800">Panel de Control Admin</h1>
-            <p className="text-stone-500">Gestión de inventario y visibilidad de la carta</p>
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+            <div>
+              <h1 className="text-4xl font-bold text-stone-800">Panel de Control Admin</h1>
+              <p className="text-stone-500">Gestión de inventario y visibilidad de la carta</p>
+            </div>
+            <div className="flex items-center gap-3 bg-stone-200/50 px-4 py-2 rounded-2xl border border-stone-300">
+               <span className="text-xs font-bold text-stone-500 uppercase tracking-widest">Sesión:</span>
+               <span className="text-sm font-bold text-stone-800">{adminNombre}</span>
+               <button 
+                onClick={cerrarSesion}
+                className="ml-2 text-red-600 hover:text-red-700 font-bold text-xs bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl border border-red-200 transition-all"
+               >
+                 Salir 🚪
+               </button>
+            </div>
           </div>
           
           <div className="flex items-center gap-4">
