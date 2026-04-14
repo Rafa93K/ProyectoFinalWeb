@@ -85,13 +85,14 @@ export const Conocenos = () => {
         <div className="space-y-8 text-center">
           <h2 className="text-3xl font-bold text-[#30312E]">¿Dónde encontrarnos?</h2>
           <p className="text-lg text-[#30312E]/80 m-0 mb-4">C. Peñas Rojas, 80, 14200 Peñarroya-Pueblonuevo, Córdoba</p>
-          <div className="w-full h-[450px] rounded-3xl overflow-hidden shadow-2xl border-8 border-white">
-            <iframe
-              src="https://www.google.com/maps/d/embed?mid=1cmzj9sj2tEzT3Rx8O0gMnGjH4AnpWzc&ehbc=2E312F&noprof=1"
-              className="w-full h-full grayscale-[0.3] contrast-[1.1]"
-              title="Ubicación Fogón"
-            ></iframe>
-          </div>
+         <div className="w-full h-[400px] overflow-hidden relative"> 
+  {/* El contenedor corta lo que sobresale */}
+  <iframe
+    src="https://www.google.com/maps/d/embed?mid=1cmzj9sj2tEzT3Rx8O0gMnGjH4AnpWzc&ehbc=2E312F&noprof=1"
+    className="absolute top-[-50px] left-0 w-full h-[calc(100%+50px)] grayscale-[0.3] border-0"
+    title="Ubicación Fogón"
+  ></iframe>
+</div>
           <p className="text-2xl text-[#30312E] font-semibold italic mt-8 tracking-wide drop-shadow-sm">"Te esperamos con las brasas encendidas."</p>
         </div>
       </section>
