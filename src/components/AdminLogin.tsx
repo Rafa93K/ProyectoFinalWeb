@@ -31,7 +31,7 @@ const AdminLogin: React.FC = () => {
             formData.append('password', password);
 
             // Ajustar esta URL a la ruta real de tu backend
-            const respuesta = await fetch('http://localhost/proyectoWeb/backend/loginAdmin.php', {
+            const respuesta = await fetch('https://localhost/proyectoWeb/backend/loginAdmin.php', {
                 method: 'POST',
                 body: formData
             });

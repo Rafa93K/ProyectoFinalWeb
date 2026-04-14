@@ -23,7 +23,7 @@ const Carta: React.FC = () => {
 
   const fetchConfig = async () => {
     try {
-      const response = await fetch('http://rafa.cicloflorenciopintado.es/getAdminConfig.php');
+      const response = await fetch('https://rafa.cicloflorenciopintado.es/getAdminConfig.php');
       const data = await response.json();
       if (data.success) {
         setMostrarEspeciales(data.especials === 1 || data.especials === true);

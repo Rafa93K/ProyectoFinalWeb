@@ -57,7 +57,7 @@ const PanelAdmin: React.FC = () => {
    */
   const obtenerConfigAdmin = async () => {
     try {
-      const respuesta = await fetch('http://rafa.cicloflorenciopintado.es/getAdminConfig.php');
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/getAdminConfig.php');
       const datos = await respuesta.json();
       if (datos.success) {
         setMostrarEspeciales(datos.especials === 1 || datos.especials === true);
@@ -86,7 +86,7 @@ const PanelAdmin: React.FC = () => {
       */
       
       // Realizamos la petición (sustituir URL por la real en producción)
-      const respuesta = await fetch('http://rafa.cicloflorenciopintado.es/getProductos.php?tipo=all');
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/getProductos.php?tipo=all');
       const datos = await respuesta.json();
       setListaProductos(Array.isArray(datos) ? datos : []);
     } catch (error) {
@@ -106,7 +106,7 @@ const PanelAdmin: React.FC = () => {
       const formData = new FormData();
       formData.append('especials', nuevoEstado ? '1' : '0');
 
-      const respuesta = await fetch('http://rafa.cicloflorenciopintado.es/actualizarConfigAdmin.php', {
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/actualizarConfigAdmin.php', {
         method: 'POST',
         body: formData
       });
