@@ -89,7 +89,7 @@ export const Conocenos = () => {
   {/* El contenedor corta lo que sobresale */}
   <iframe
     src="https://www.google.com/maps/d/embed?mid=1cmzj9sj2tEzT3Rx8O0gMnGjH4AnpWzc&ehbc=2E312F&noprof=1"
-    className="absolute top-[-50px] left-0 w-full h-[calc(100%+50px)] grayscale-[0.3] border-0"
+    className="absolute top-[-60px] left-0 w-full h-[calc(100%+50px)] grayscale-[0.3] border-0"
     title="Ubicación Fogón"
   ></iframe>
 </div>
