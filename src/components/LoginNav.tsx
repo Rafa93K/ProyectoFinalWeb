@@ -2,19 +2,26 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const LoginNav = () => {
-  const [usuario, setUsuario] = useState<string | null>(null);
+  const [usuario, setUsuario] = useState<{ nombre: string, telefono: string } | null>(null);
   const navegar = useNavigate();
 
   useEffect(() => {
     // Comprobamos si hay una sesión activa al cargar
-    const sesion = localStorage.getItem('usuarioSesion');
-    setUsuario(sesion);
+    const sesionRaw = localStorage.getItem('usuarioSesion');
+    if (sesionRaw) {
+      try {
+        const sesion = JSON.parse(sesionRaw);
+        setUsuario(sesion);
+      } catch (e) {
+        // Por si acaso hay datos antiguos que no son JSON
+        localStorage.removeItem('usuarioSesion');
+      }
+    }
   }, []);
 
   const cerrarSesion = () => {
     localStorage.removeItem('usuarioSesion');
-    setUsuario(null);
-    alert('Sesión cerrada');
+    setUsuario(null);    
     navegar('/');
   };
 
@@ -23,8 +30,14 @@ const LoginNav = () => {
       {usuario ? (
         <>
           <span className="text-[#30312E]/60 text-sm italic">
-            Hola, <span className="font-bold text-[#30312E]">{usuario}</span>
+            Hola, <span className="font-bold text-[#30312E]">{usuario.nombre}</span>
           </span>
+          <Link 
+            to="/mis-reservas" 
+            className="text-[#30312E] hover:text-[#30312E]/70 text-xs font-bold uppercase tracking-widest transition-colors flex items-center gap-1 border border-[#30312E]/20 px-3 py-1 rounded-lg hover:bg-stone-50"
+          >
+            📋 Ver mis reservas
+          </Link>
           <button 
             onClick={cerrarSesion}
             className="text-red-700 hover:text-red-900 text-xs font-bold uppercase tracking-widest transition-colors flex items-center gap-1 border border-red-200 px-3 py-1 rounded-lg hover:bg-red-50"

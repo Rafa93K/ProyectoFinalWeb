@@ -1,5 +1,4 @@
 <?php
-// Cabeceras idénticas a tu archivo de productos que SÍ funciona
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
@@ -9,13 +8,23 @@ header("Content-Security-Policy: upgrade-insecure-requests");
 require_once 'conexion.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Captura de datos estilo "productos.php"
     $nombre = isset($_POST['nombre']) ? $_POST['nombre'] : null;
     $telefono = isset($_POST['telefono']) ? $_POST['telefono'] : null;
     $contrasena = isset($_POST['contrasena']) ? $_POST['contrasena'] : null;
+    $confirmar_password = isset($_POST['confirmar_password']) ? $_POST['confirmar_password'] : null;
 
-    if (!$nombre || !$telefono || !$contrasena) {
+    if (!$nombre || !$telefono || !$contrasena || !$confirmar_password) {
         echo json_encode(["success" => false, "message" => "Faltan datos en el formulario"]);
+        exit;
+    }
+
+    if ($contrasena !== $confirmar_password) {
+        echo json_encode(["success" => false, "message" => "Las contraseñas no coinciden"]);
+        exit;
+    }
+
+    if (strlen($telefono) < 9) {
+        echo json_encode(["success" => false, "message" => "El número de teléfono debe tener al menos 9 dígitos"]);
         exit;
     }
 

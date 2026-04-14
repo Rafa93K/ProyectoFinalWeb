@@ -11,6 +11,7 @@ import AdminLogin from './components/AdminLogin';
 import LoginNav from './components/LoginNav';
 import Registro from './components/Registro';
 import Login from './components/Login';
+import PanelUsuario from './components/PanelUsuario';
 
 
 
@@ -83,6 +84,7 @@ function App() {
         <Route path="/carta" element={<Carta />} />
         <Route path="/reservar" element={<Reservar />} />
         <Route path="/conocenos" element={<Conocenos />} />
+        <Route path="/mis-reservas" element={<PanelUsuario />} />
         <Route path="/aviso-legal" element={<AvisoLegal />} />
         <Route path="/privacidad" element={<Privacidad />} />
         <Route path="/cookies" element={<Cookies />} />

@@ -10,7 +10,6 @@ require_once 'conexion.php';
 $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : 'carta';
 
 try {
-    // Adaptamos la consulta para que mantenga el orden que usabas antes
     $sql = "SELECT id_producto, nombre, descripcion, precio, tipo, subtipo, imagen 
             FROM Producto 
             WHERE tipo = :tipo 

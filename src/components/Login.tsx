@@ -2,30 +2,45 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
-    const [nombre, setNombre] = useState('');
+    const [telefono, setTelefono] = useState('');
     const [password, setPassword] = useState('');
     const navegar = useNavigate();
 
     /**
      * Maneja el inicio de sesión
      */
-    const manejarLogin = async (e: React.FormEvent) => {
+    const manejarLogin = async (e: React.SubmitEvent) => {
         e.preventDefault();
         
-        /* 
-           CONEXIÓN CON BASE DE DATOS:
-           Aquí harías la petición a login.php enviando nombre y password.
-           Ej: const respuesta = await fetch('backend/login.php', { method: 'POST', body: ... });
-        */
+        try {
+            const formData = new FormData();
+            formData.append('telefono', telefono);
+            formData.append('contrasena', password);
 
-        console.log('Iniciando sesión con:', { nombre, password });
+            const response = await fetch('https://rafa.cicloflorenciopintado.es/loginUsuario.php', {
+                method: 'POST',
+                body: formData
+            });
 
-        // SIMULACIÓN DE SESIÓN: Guardamos el usuario en localStorage
-        localStorage.setItem('usuarioSesion', nombre);
-        
-        alert('Sesión iniciada correctamente (Simulación)');
-        navegar('/'); // Redirigir al inicio
-        window.location.reload(); // Recargar para actualizar el Nav (en una app real usaríamos Context)
+            const result = await response.json();
+
+            if (result.success) {
+                // Guardamos el objeto usuario completo en localStorage
+                const usuarioData = {
+                    nombre: result.nombre,
+                    telefono: telefono
+                };
+                localStorage.setItem('usuarioSesion', JSON.stringify(usuarioData));
+                
+                navegar('/home'); // Redirigir al inicio
+                window.location.reload(); // Recargar para actualizar el Nav
+            } else {
+                alert(result.message || 'Error al iniciar sesión');
+            }
+        } catch (error) {
+            console.error('Error en el login:', error);
+            alert('Hubo un error al conectar con el servidor');
+        }
     };
 
     return (
@@ -38,13 +53,14 @@ const Login: React.FC = () => {
 
                 <form onSubmit={manejarLogin} className="p-8 space-y-5">
                     <div>
-                        <label className="block text-xs font-bold text-stone-500 mb-2 uppercase tracking-widest">Nombre de Usuario</label>
+                        <label className="block text-xs font-bold text-stone-500 mb-2 uppercase tracking-widest">Nº Teléfono</label>
                         <input 
                             type="text" 
                             required
+                            placeholder="600 000 000"
                             className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#30312E] outline-none transition-all"
-                            value={nombre}
-                            onChange={(e) => setNombre(e.target.value)}
+                            value={telefono}
+                            onChange={(e) => setTelefono(e.target.value)}
                         />
                     </div>
 
@@ -53,6 +69,7 @@ const Login: React.FC = () => {
                         <input 
                             type="password" 
                             required
+                            placeholder="••••••••"
                             className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#30312E] outline-none transition-all"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}

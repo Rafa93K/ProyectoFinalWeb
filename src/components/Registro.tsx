@@ -6,21 +6,56 @@ const Registro: React.FC = () => {
     const [datos, setDatos] = useState({
         nombre: '',
         telefono: '',
-        password: ''
+        password: '',
+        confirmPassword: ''
     });
 
     /**
      * Maneja el envío del formulario
      */
-    const manejarRegistro = async (e: React.FormEvent) => {
+    const manejarRegistro = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
-        /* 
-           CONEXIÓN CON BASE DE DATOS:
-           Aquí harías el POST a tu servidor PHP (ej: registroUsuarios.php)
-           para insertar los datos en la tabla de usuarios.
-        */
-        console.log('Registrando usuario:', datos);
-        alert('Registro completado (Simulación)');
+        
+        if (datos.password !== datos.confirmPassword) {
+            alert('Las contraseñas no coinciden');
+            return;
+        }
+
+        if (datos.telefono.length < 9) {
+            alert('El número de teléfono debe tener al menos 9 dígitos');
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('nombre', datos.nombre);
+            formData.append('telefono', datos.telefono);
+            formData.append('contrasena', datos.password);
+            formData.append('confirmar_password', datos.confirmPassword);
+
+            const response = await fetch('https://rafa.cicloflorenciopintado.es/registroUsuario.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert(result.message);
+                // Guardamos el objeto usuario en localStorage para iniciar sesión automáticamente
+                const usuarioData = {
+                    nombre: datos.nombre,
+                    telefono: datos.telefono
+                };
+                localStorage.setItem('usuarioSesion', JSON.stringify(usuarioData));
+                window.location.href = '/home';
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error('Error en el registro:', error);
+            alert('Hubo un error al procesar el registro');
+        }
     };
 
     return (
@@ -51,6 +86,7 @@ const Registro: React.FC = () => {
                         <input 
                             type="tel" 
                             required
+                            minLength={9}
                             placeholder="600 000 000"
                             className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#30312E] outline-none transition-all"
                             value={datos.telefono}
@@ -67,6 +103,18 @@ const Registro: React.FC = () => {
                             className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#30312E] outline-none transition-all"
                             value={datos.password}
                             onChange={(e) => setDatos({...datos, password: e.target.value})}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-stone-500 mb-2 uppercase tracking-widest">Confirmar Contraseña</label>
+                        <input 
+                            type="password" 
+                            required
+                            placeholder="••••••••"
+                            className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#30312E] outline-none transition-all"
+                            value={datos.confirmPassword}
+                            onChange={(e) => setDatos({...datos, confirmPassword: e.target.value})}
                         />
                     </div>
 
