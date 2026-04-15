@@ -82,7 +82,7 @@ const PanelUsuario: React.FC = () => {
     }
 
     return (
-        <div className="flex-1 bg-stone-50 p-6 md:p-12">
+        <div className="flex-1 bg-[#D3CCBC] p-6 md:p-12">
             <div className="max-w-4xl mx-auto">
                 <header className="mb-10 text-center">
                     <h1 className="text-4xl font-bold text-stone-800 mb-2 font-serif">Mis Reservas</h1>
@@ -90,8 +90,8 @@ const PanelUsuario: React.FC = () => {
                 </header>
 
                 {reservas.length === 0 ? (
-                    <div className="bg-white rounded-3xl p-12 text-center shadow-sm border border-stone-200">
-                        <div className="text-6xl mb-4">📅</div>
+                    <div className="bg-[#e2dbc9] rounded-3xl p-12 text-center shadow-sm border border-stone-200">
+                        <img src="/calendar.svg" alt="Calendario" className="w-20 h-20 mx-auto mb-6 opacity-80" />
                         <h3 className="text-xl font-bold text-stone-700 mb-2">No tienes reservas activas</h3>
                         <p className="text-stone-500 mb-6">¿Te apetece disfrutar de nuestra cocina hoy?</p>
                         <button 

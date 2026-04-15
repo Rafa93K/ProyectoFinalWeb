@@ -11,7 +11,7 @@ interface Producto {
 }
 
 const Carta: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'carta' | 'vinos' | 'especial'>('carta');
+  const [activeTab, setActiveTab] = useState<'Carta' | 'Vinos' | 'Especial'>('Carta');
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [mostrarEspeciales, setMostrarEspeciales] = useState(true);
@@ -58,7 +58,7 @@ const Carta: React.FC = () => {
   };
 
   const groupByType = () => {
-    if (activeTab === 'especial') return { 'Nuestros Especiales': productos };
+    if (activeTab === 'Especial') return { 'Nuestros Especiales': productos };
     
     const groups: { [key: string]: Producto[] } = {};
     productos.forEach(p => {
@@ -74,13 +74,13 @@ const Carta: React.FC = () => {
   return (
     <div className="flex-1 bg-[#D3CCBC] py-12 px-4 md:px-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-5xl font-bold text-[#30312E] text-center mb-12 font-serif">Nuestra Selección</h1>
+        <h1 className="text-4xl md:text-5xl font-bold text-[#30312E] text-center mb-12 font-serif">Nuestra Selección</h1>
         
         {/* Tabs */}
-        <div className="flex justify-center gap-4 mb-16">
-          {(['carta', 'vinos', 'especial'] as const)
+        <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-12 md:mb-16">
+          {(['Carta', 'Vinos', 'Especial'] as const)
             .filter(tab => {
-              if (tab === 'especial') {
+              if (tab === 'Especial') {
                 return mostrarEspeciales;
               }
               return true;
@@ -89,13 +89,13 @@ const Carta: React.FC = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-8 py-3 rounded-full font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-md ${
+              className={`px-6 py-2 md:px-8 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 transform hover:scale-105 shadow-md ${
                 activeTab === tab 
                 ? 'bg-[#30312E] text-[#D3CCBC]' 
                 : 'bg-white/50 text-[#30312E] hover:bg-white'
               }`}
             >
-              {tab.charAt(0) + tab.slice(1)}
+              {tab}
             </button>
           ))}
         </div>
@@ -117,8 +117,8 @@ const Carta: React.FC = () => {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {items.map((item) => (
-                    <div key={item.id_producto} className="flex gap-4 md:gap-6 bg-white/40 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-                      <div className="w-24 h-24 md:w-32 md:h-32 shrink-0 overflow-hidden rounded-xl bg-white/20">
+                    <div key={item.id_producto} className="flex gap-4 bg-white/40 p-4 md:p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                      <div className="w-20 h-20 md:w-32 md:h-32 shrink-0 overflow-hidden rounded-xl bg-white/20">
                         <img 
                           src={getImagePath(item.imagen)} 
                           alt={item.nombre} 

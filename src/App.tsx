@@ -12,6 +12,7 @@ import LoginNav from './components/LoginNav';
 import Registro from './components/Registro';
 import Login from './components/Login';
 import PanelUsuario from './components/PanelUsuario';
+import {Reservar} from './components/Reservar';
 
 
 
@@ -70,8 +71,7 @@ const Home = () => {
   );
 };
 
-// Componentes temporales para las demás páginas
-const Reservar = () => <div className="flex-1 flex items-center justify-center text-4xl text-[#30312E]">Página de Reservas (En construcción)</div>;
+
 
 function App() {
   return (
