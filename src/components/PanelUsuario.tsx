@@ -67,7 +67,7 @@ const PanelUsuario: React.FC = () => {
         for (let h = 13; h <= 15; h++) {
             for (let m = 0; m < 60; m += 15) {
                 const time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-                if (time >= "13:30" && time <= "15:45") slots.push(time);
+                if (time >= "13:30" && time <= "15:30") slots.push(time);
             }
         }
 
@@ -75,7 +75,7 @@ const PanelUsuario: React.FC = () => {
             for (let h = 20; h <= 22; h++) {
                 for (let m = 0; m < 60; m += 15) {
                     const time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-                    if (time >= "20:30" && time <= "22:45") slots.push(time);
+                    if (time >= "20:30" && time <= "22:30") slots.push(time);
                 }
             }
         }
@@ -145,7 +145,7 @@ const PanelUsuario: React.FC = () => {
         });
     };
 
-    const handleActualizar = async (e: React.FormEvent) => {
+    const handleActualizar = async (e: React.SubmitEvent) => {
         e.preventDefault();
         if (!reservaEditando) return;
         setGuardandoModificacion(true);
@@ -209,7 +209,7 @@ const PanelUsuario: React.FC = () => {
                 ) : (
                     <div className="grid gap-6">
                         {reservas.map(reserva => (
-                            <div key={reserva.id_reserva} className="bg-[#E2DBC9] rounded-2xl p-6 shadow-md border border-stone-100 flex flex-col md:flex-row justify-between items-center gap-4 hover:shadow-lg transition-shadow">
+                            <div key={reserva.id_reserva} className="bg-[#E2DBC9] rounded-2xl p-4 shadow-md border border-stone-100 flex flex-col md:flex-row justify-between items-center gap-4 hover:shadow-lg transition-shadow">
                                 <div className="flex items-center gap-4">
                                     <div className="bg-[#D3CCBC] p-4 rounded-xl text-center min-w-[80px]">
                                         <div className="text-xs font-bold text-stone-400 uppercase tracking-tighter">Personas</div>

@@ -23,33 +23,55 @@ if (!$id_reserva || !$fecha || !$hora || !$personas) {
 
 try {
     // 1. Validar reglas de negocio (Martes Cerrado, Horarios)
-    $diaSemana = date('w', strtotime($fecha)); // 0 (Domingo) - 6 (Sábado)
-    
+    $diaSemana = date('N', strtotime($fecha)); // 1 (Lu) - 7 (Dom)
+    $esMediodia = false;
+    $esNoche = false;
+    $inicioTurno = '';
+    $finTurno = '';
+
+    // Turno Mediodía: 13:30 - 15:30
+    if ($hora >= '13:30' && $hora <= '15:30') {
+        $inicioTurno = '13:30';
+        $finTurno = '15:30';
+        $esMediodia = true;
+    } 
+    // Turno Noche: 20:30 - 22:30
+    elseif ($hora >= '20:30' && $hora <= '22:30') {
+        $inicioTurno = '20:30';
+        $finTurno = '22:30';
+        $esNoche = true;
+    } else {
+        echo json_encode(["success" => false, "message" => "Horario fuera de servicio (Turnos: 13:30-15:30 o 20:30-22:30)."]);
+        exit;
+    }
+
     // Martes (2) cerrado
     if ($diaSemana == 2) {
-        echo json_encode(["success" => false, "message" => "Lo sentimos, los martes estamos cerrados."]);
+        echo json_encode(["success" => false, "message" => "El martes estamos cerrados."]);
         exit;
     }
 
-    // Validar Turnos (Simplificado pero coherente con el frontend)
-    $esFinDeSemana = ($diaSemana == 5 || $diaSemana == 6); // Viernes o Sábado
-    $esTurnoAlmuerzo = ($hora >= "13:30" && $hora <= "15:45");
-    $esTurnoCena = ($hora >= "20:30" && $hora <= "22:45");
-
-    if (!$esTurnoAlmuerzo && !($esFinDeSemana && $esTurnoCena)) {
-        echo json_encode(["success" => false, "message" => "El horario seleccionado no es válido para este día."]);
+    // Lunes, Miércoles, Jueves (1,3,4) y Domingo (7) -> Solo mediodía
+    if (in_array($diaSemana, [1, 3, 4, 7]) && $esNoche) {
+        echo json_encode(["success" => false, "message" => "En el día seleccionado solo abrimos para almuerzos (mediodía)."]);
         exit;
     }
 
-    // 2. Control de Aforo (50 personas máximo por tramo horario, excluyendo la reserva actual)
-    $sqlAforo = "SELECT SUM(personas) as total FROM Reserva WHERE fecha = :fecha AND hora = :hora AND id_reserva != :id";
-    $stmtAforo = $pdo->prepare($sqlAforo);
-    $stmtAforo->execute(['fecha' => $fecha, 'hora' => $hora, 'id' => $id_reserva]);
-    $resultadoAforo = $stmtAforo->fetch(PDO::FETCH_ASSOC);
-    $totalActual = $resultadoAforo['total'] ? intval($resultadoAforo['total']) : 0;
+    // 2. Control de Aforo por Turno (Excluyendo la propia reserva que se edita)
+    $sqlCapacidad = "
+        SELECT COALESCE(SUM(personas), 0) as total
+        FROM Reserva
+        WHERE fecha = ?
+        AND (hora BETWEEN ? AND ?)
+        AND id_reserva != ?
+    ";
+    
+    $stmtCapacidad = $pdo->prepare($sqlCapacidad);
+    $stmtCapacidad->execute([$fecha, $inicioTurno, $finTurno, $id_reserva]);
+    $totalActual = $stmtCapacidad->fetch(PDO::FETCH_ASSOC)['total'];
 
     if (($totalActual + $personas) > 50) {
-        echo json_encode(["success" => false, "message" => "Lo sentimos, no hay suficiente aforo para ese horario. Capacidad restante: " . (50 - $totalActual)]);
+        echo json_encode(["success" => false, "message" => "No hay disponibilidad suficiente para ese turno. Capacidad restante: " . (50 - $totalActual)]);
         exit;
     }
 
@@ -74,6 +96,6 @@ try {
     }
 
 } catch (PDOException $e) {
-    echo json_encode(["success" => false, "message" => "Error de base de datos: " . $e->getMessage()]);
+    echo json_encode(["success" => false, "message" => "Error SQL: " . $e->getMessage()]);
 }
 ?>

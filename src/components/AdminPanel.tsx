@@ -69,7 +69,7 @@ const PanelAdmin: React.FC = () => {
 
   const cerrarSesion = () => {
     localStorage.removeItem('adminSesion');
-    navegar('/admin/login');
+    navegar('/');
     window.location.reload();
   };
 
@@ -246,34 +246,35 @@ const PanelAdmin: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 bg-stone-100 p-6 md:p-10 font-sans">
+    <div className="flex-1 bg-[#D3CCBC] min-h-screen p-4 md:p-10 font-sans">
       <div className="max-w-7xl mx-auto">
         {/* CABECERA DEL PANEL */}
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-            <div>
-              <h1 className="text-4xl font-bold text-stone-800">Panel de Control Admin</h1>
-              <p className="text-stone-500">Gestión de inventario y visibilidad de la carta</p>
+        <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6 w-full lg:w-auto">
+            <div className="bg-[#30312E] p-6 rounded-3xl shadow-xl w-full">
+              <h1 className="text-3xl font-bold text-[#D3CCBC] font-serif ">Panel de Control</h1>
+              <p className="text-[#D3CCBC]/60 text-xs uppercase tracking-widest mt-1">Gestión Administrativa</p>
             </div>
-            <div className="flex items-center gap-3 bg-stone-200/50 px-4 py-2 rounded-2xl border border-stone-300">
-              <span className="text-xs font-bold text-stone-500 uppercase tracking-widest">Sesión:</span>
-              <span className="text-sm font-bold text-stone-800">{adminNombre}</span>
+            
+            <div className="flex items-center gap-3 bg-[#E2DBC9] px-5 py-3 rounded-2xl border border-[#30312E]/10 shadow-sm">
+              <span className="text-xs font-bold text-[#30312E]/50 uppercase tracking-widest">Sesión:</span>
+              <span className="text-sm font-bold text-[#30312E]">{adminNombre}</span>
               <button
                 onClick={cerrarSesion}
-                className="ml-2 text-red-600 hover:text-red-700 font-bold text-xs bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl border border-red-200 transition-all"
+                className="ml-2 text-red-800 hover:text-red-900 font-bold text-xs bg-red-50 hover:bg-red-100 px-4 py-2 rounded-xl border border-red-200 transition-all uppercase tracking-tighter"
               >
-                Salir 🚪
+                Cerrar Sesión
               </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
             {/* CONTROL DE ESPECIALES (TOGGLE) */}
-            <div className="flex items-center gap-3 bg-white p-3 rounded-2xl shadow-sm border border-stone-200">
-              <span className="text-sm font-semibold text-stone-600">Especiales:</span>
+            <div className="flex-1 md:flex-none flex items-center justify-between gap-4 bg-[#E2DBC9] p-4 rounded-3xl shadow-sm border border-[#30312E]/10">
+              <span className="text-sm font-bold text-[#30312E] uppercase tracking-tight">Mostrar Especiales:</span>
               <button
                 onClick={alternarEspeciales}
-                className={`w-14 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${mostrarEspeciales ? 'bg-green-500' : 'bg-stone-300'}`}
+                className={`w-14 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${mostrarEspeciales ? 'bg-green-600' : 'bg-stone-400'}`}
               >
                 <div className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${mostrarEspeciales ? 'translate-x-7' : 'translate-x-0'}`} />
               </button>
@@ -281,67 +282,89 @@ const PanelAdmin: React.FC = () => {
 
             <button
               onClick={abrirModalCreacion}
-              className="bg-stone-800 text-white px-6 py-3 rounded-xl font-bold hover:bg-stone-700 transition-all shadow-md flex items-center gap-2"
+              className="flex-1 md:flex-none bg-[#30312E] text-[#D3CCBC] px-8 py-4 rounded-3xl font-bold hover:bg-[#4a4b46] transition-all shadow-xl flex items-center justify-center gap-2 transform active:scale-95"
             >
-              <span className="text-xl">+</span> Añadir Producto
+              <span className="text-2xl">+</span> AÑADIR PRODUCTO
             </button>
           </div>
         </header>
 
         {/* LISTADO DE PRODUCTOS */}
         {cargando ? (
-          <div className="flex justify-center py-20 text-stone-800 italic">Cargando productos...</div>
+          <div className="flex flex-col items-center justify-center py-32 space-y-4">
+             <div className="w-12 h-12 border-4 border-[#30312E]/20 border-t-[#30312E] rounded-full animate-spin"></div>
+             <p className="text-[#30312E] font-serif italic text-xl">Cargando inventario...</p>
+          </div>
         ) : (
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-stone-200">
+          <div className="bg-[#E2DBC9] rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20">
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-stone-50 border-b border-stone-200">
-                    <th className="px-6 py-4 text-stone-600 font-bold uppercase text-xs">Producto</th>
-                    <th className="px-6 py-4 text-stone-600 font-bold uppercase text-xs">Tipo / Subtipo</th>
-                    <th className="px-6 py-4 text-stone-600 font-bold uppercase text-xs">Precio</th>
-                    <th className="px-6 py-4 text-stone-600 font-bold uppercase text-xs text-right">Acciones</th>
+                  <tr className="bg-[#30312E] text-[#D3CCBC]">
+                    <th className="px-8 py-6 font-bold uppercase text-xs tracking-widest">Plato / Descripción</th>
+                    <th className="px-8 py-6 font-bold uppercase text-xs tracking-widest">Categorización</th>
+                    <th className="px-8 py-6 font-bold uppercase text-xs tracking-widest">Precio</th>
+                    <th className="px-8 py-6 font-bold uppercase text-xs tracking-widest text-right">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-100">
-                  {listaProductos.map((prod) => (
-                    <tr key={prod.id_producto} className="hover:bg-stone-50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-4">
-                          <img
-                            src={prod.imagen || '/Img/default.jpg'}
-                            alt={prod.nombre}
-                            className="w-12 h-12 rounded-lg object-cover border border-stone-100"
-                          />
-                          <div>
-                            <div className="font-bold text-stone-800">{prod.nombre}</div>
-                            <div className="text-xs text-stone-400 truncate max-w-[200px]">{prod.descripcion}</div>
+                <tbody className="divide-y divide-[#30312E]/5">
+                  {listaProductos.length > 0 ? (
+                    listaProductos.map((prod) => (
+                      <tr key={prod.id_producto} className="hover:bg-white/30 transition-colors group">
+                        <td className="px-8 py-6">
+                          <div className="flex items-center gap-5">
+                            <div className="relative">
+                              <img
+                                src={prod.imagen || '/Img/default.jpg'}
+                                alt={prod.nombre}
+                                className="w-16 h-16 rounded-2xl object-cover shadow-lg border-2 border-white/50 group-hover:scale-110 transition-transform duration-300"
+                              />
+                              {prod.tipo === 'especial' && (
+                                <span className="absolute -top-2 -right-2 bg-yellow-500 text-white text-[10px] font-black px-2 py-1 rounded-full shadow-md animate-pulse">🌟</span>
+                              )}
+                            </div>
+                            <div>
+                              <div className="font-bold text-[#30312E] text-lg font-serif">{prod.nombre}</div>
+                              <div className="text-xs text-[#30312E]/60 mt-1 max-w-[300px] line-clamp-2 md:line-clamp-none">{prod.descripcion}</div>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-stone-600">
-                        <span className="px-2 py-1 bg-stone-100 rounded text-xs font-semibold mr-2 capitalize">{prod.tipo}</span>
-                        <span className="text-xs italic capitalize">{prod.subtipo}</span>
-                      </td>
-                      <td className="px-6 py-4 font-bold text-stone-800">{prod.precio}€</td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex justify-end gap-2">
-                          <button
-                            onClick={() => abrirModalEdicion(prod)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            onClick={() => eliminarProducto(prod.id_producto)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          >
-                            🗑️
-                          </button>
-                        </div>
+                        </td>
+                        <td className="px-8 py-6">
+                          <div className="flex flex-col gap-1">
+                            <span className="px-3 py-1 bg-[#30312E] text-[#D3CCBC] rounded-lg text-[10px] font-black uppercase tracking-wider w-fit">{prod.tipo}</span>
+                            <span className="text-xs font-bold text-[#30312E]/40 italic ml-1">{prod.subtipo}</span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6">
+                          <span className="text-xl font-bold text-[#30312E]">{prod.precio}<small className="text-sm ml-0.5">€</small></span>
+                        </td>
+                        <td className="px-8 py-6">
+                          <div className="flex justify-end gap-3">
+                            <button
+                              onClick={() => abrirModalEdicion(prod)}
+                              className="w-12 h-12 flex items-center justify-center bg-white/50 text-[#30312E] hover:bg-[#30312E] hover:text-[#D3CCBC] rounded-2xl transition-all shadow-sm border border-white/80"
+                              title="Editar"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              onClick={() => eliminarProducto(prod.id_producto)}
+                              className="w-12 h-12 flex items-center justify-center bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-2xl transition-all shadow-sm border border-red-100"
+                              title="Eliminar"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="px-8 py-20 text-center text-[#30312E]/40 italic font-serif text-xl">
+                        No hay productos registrados en esta sección.
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>

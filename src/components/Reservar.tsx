@@ -55,22 +55,22 @@ export const Reservar: React.FC = () => {
 
         const slots: string[] = [];
         
-        // Almuerzo: 13:30 - 15:45 (Todos menos Martes)
+        // Turno Mediodía: 13:30 - 15:30 (Todos los días excepto Martes)
         for (let h = 13; h <= 15; h++) {
             for (let m = 0; m < 60; m += 15) {
                 const time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-                if (time >= "13:30" && time <= "15:45") {
+                if (time >= "13:30" && time <= "15:30") {
                     slots.push(time);
                 }
             }
         }
 
-        // Cena: Viernes (5) y Sábado (6) 20:30 - 22:45
+        // Turno Noche: 20:30 - 22:30 (Solo Viernes [5] y Sábado [6])
         if (dayOfWeek === 5 || dayOfWeek === 6) {
             for (let h = 20; h <= 22; h++) {
                 for (let m = 0; m < 60; m += 15) {
                     const time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-                    if (time >= "20:30" && time <= "22:45") {
+                    if (time >= "20:30" && time <= "22:30") {
                         slots.push(time);
                     }
                 }
@@ -125,13 +125,12 @@ export const Reservar: React.FC = () => {
             const result = await response.json();
             if (result.success) {
                 setCompletado(true);
-                // Redirigir al panel de usuario tras un breve retraso
-                setTimeout(() => navigate('/panel-usuario'), 3000);
+                // Redirigir tras un breve retraso
+                setTimeout(() => navigate('/carta'), 3000);
             } else {
                 alert(result.message || 'Hubo un error al procesar tu reserva. Inténtalo de nuevo.');
             }
         } catch (error) {
-            console.error('Error al enviar reserva:', error);
             alert('No se pudo conectar con el servidor.');
         } finally {
             setEnviando(false);

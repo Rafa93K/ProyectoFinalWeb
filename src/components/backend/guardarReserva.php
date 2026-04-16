@@ -41,36 +41,35 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $inicioTurno = '';
     $finTurno = '';
 
-    // Almuerzo: 13:30 - 15:45 (Todos menos Martes)
-    if ($hora >= '13:30' && $hora <= '15:45') {
+    // Turno Mediodía: 13:30 - 15:30
+    if ($hora >= '13:30' && $hora <= '15:30') {
         $inicioTurno = '13:30';
-        $finTurno = '15:45';
+        $finTurno = '15:30';
         $esMediodia = true;
     } 
-    // Cena: 20:30 - 22:45 (Solo Viernes y Sábado)
-    elseif ($hora >= '20:30' && $hora <= '22:45') {
+    // Turno Noche: 20:30 - 22:30
+    elseif ($hora >= '20:30' && $hora <= '22:30') {
         $inicioTurno = '20:30';
-        $finTurno = '22:45';
+        $finTurno = '22:30';
         $esNoche = true;
     } else {
-        echo json_encode(["success" => false, "message" => "El horario seleccionado no está disponible (Turnos: 13:30-15:45 o 20:30-22:45)."]);
+        echo json_encode(["success" => false, "message" => "Horario fuera de servicio (Turnos: 13:30-15:30 o 20:30-22:30)."]);
         exit;
     }
 
-    // Martes cerrado
+    // Martes (2) cerrado
     if ($diaSemana == 2) {
-        echo json_encode(["success" => false, "message" => "Los martes estamos cerrados por descanso del personal."]);
+        echo json_encode(["success" => false, "message" => "El martes estamos cerrados."]);
         exit;
     }
 
-    // Lunes, Miércoles, Jueves y Domingo -> Solo mediodía
-    $diasSoloMediodia = [1, 3, 4, 7]; // 1:Lu, 3:Mi, 4:Ju, 7:Do
-    if (in_array($diaSemana, $diasSoloMediodia) && $esNoche) {
+    // Lunes, Miércoles, Jueves (1,3,4) y Domingo (7) -> Solo mediodía
+    if (in_array($diaSemana, [1, 3, 4, 7]) && $esNoche) {
         echo json_encode(["success" => false, "message" => "En el día seleccionado solo abrimos para almuerzos (mediodía)."]);
         exit;
     }
 
-    // 5. Control de Aforo
+    // 5. Control de Aforo por Turno
     try {
         $sqlCapacidad = "
             SELECT COALESCE(SUM(personas), 0) as total
@@ -84,11 +83,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $totalActual = $stmtCapacidad->fetch(PDO::FETCH_ASSOC)['total'];
 
         if (($totalActual + $personas) > $capacidadMaxima) {
-            echo json_encode(["success" => false, "message" => "Lo sentimos, aforo completo para este turno."]);
+            echo json_encode(["success" => false, "message" => "No hay disponibilidad. ¡Aforo completo para este turno!"]);
             exit;
         }
 
-        // 6. Inserción en Base de Datos (con campos opcionales)
+        // 6. Inserción en Base de Datos
         $sql = "INSERT INTO Reserva (nombre_cliente, telefono, fecha, hora, personas, mensaje, id_usuario, id_admin)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
@@ -108,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         exit;
 
     } catch (PDOException $e) {
-        echo json_encode(["success" => false, "message" => "Error en el servidor: " . $e->getMessage()]);
+        echo json_encode(["success" => false, "message" => "Error SQL: " . $e->getMessage()]);
         exit;
     }
 }

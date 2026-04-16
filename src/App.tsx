@@ -1,6 +1,6 @@
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Conocenos } from './components/Conocenos';
 import { AvisoLegal } from './components/AvisoLegal';
 import { Privacidad } from './components/Privacidad';
@@ -13,9 +13,6 @@ import Registro from './components/Registro';
 import Login from './components/Login';
 import PanelUsuario from './components/PanelUsuario';
 import { Reservar } from './components/Reservar';
-
-
-
 
 const Home = () => {
   return (
@@ -71,13 +68,14 @@ const Home = () => {
   );
 };
 
-
-
 function App() {
+  const location = useLocation();
+  const esAdmin = location.pathname.startsWith('/admin');
+
   return (
     <div className="min-h-screen bg-[#D3CCBC] flex flex-col font-serif">
       <Header />
-      <LoginNav />
+      {!esAdmin && <LoginNav />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />

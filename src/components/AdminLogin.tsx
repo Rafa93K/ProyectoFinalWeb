@@ -28,10 +28,10 @@ const AdminLogin: React.FC = () => {
             */
             const formData = new FormData();
             formData.append('usuario', nombre);
-            formData.append('password', password);
+            formData.append('contrasena', password);
 
             // Ajustar esta URL a la ruta real de tu backend
-            const respuesta = await fetch('https://localhost/proyectoWeb/backend/loginAdmin.php', {
+            const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/loginAdmin.php', {
                 method: 'POST',
                 body: formData
             });
@@ -77,7 +77,7 @@ const AdminLogin: React.FC = () => {
             <div className="w-full max-w-md bg-[#E2DBC9] backdrop-blur-md rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden border border-white/20 animate-fadeIn relative z-10">
                 <div className="bg-[#30312E] p-10 text-center relative overflow-hidden">
                     {/* Brillo decorativo */}
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/10 to-transparent opacity-50" />
+                    <div className="absolute top-0 left-0 w-full h-full bg-linear-to-br from-white/10 to-transparent opacity-50" />
                     
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-[#D3CCBC]/10 rounded-2xl mb-4 border border-[#D3CCBC]/20">
                         <span className="text-3xl">🔐</span>
