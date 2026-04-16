@@ -15,7 +15,7 @@ const Registro: React.FC = () => {
      */
     const manejarRegistro = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
-        
+
         if (datos.password !== datos.confirmPassword) {
             alert('Las contraseñas no coinciden');
             return;
@@ -60,7 +60,7 @@ const Registro: React.FC = () => {
 
     return (
         <div className="flex-1 flex items-center justify-center p-6 bg-[#D3CCBC]/30">
-            <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-stone-200 animate-fadeIn">
+            <div className="w-full max-w-md bg-[#E2DBC9] rounded-3xl shadow-2xl overflow-hidden border border-white/20 animate-fadeIn">
                 {/* Cabecera del Formulario */}
                 <div className="bg-[#30312E] p-8 text-center">
                     <h2 className="text-3xl font-bold text-[#D3CCBC] mb-2 font-serif">Crear Cuenta</h2>
@@ -71,54 +71,54 @@ const Registro: React.FC = () => {
                 <form onSubmit={manejarRegistro} className="p-8 space-y-6">
                     <div>
                         <label className="block text-xs font-bold text-stone-500 mb-2 uppercase tracking-widest">Nombre Completo</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             required
                             placeholder="Ej: Juan Pérez"
-                            className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#30312E] outline-none transition-all"
+                            className="w-full px-4 py-3 rounded-xl border border-stone-100 focus:ring-2 focus:ring-[#30312E] outline-none transition-all bg-[#D4CDBC]"
                             value={datos.nombre}
-                            onChange={(e) => setDatos({...datos, nombre: e.target.value})}
+                            onChange={(e) => setDatos({ ...datos, nombre: e.target.value })}
                         />
                     </div>
 
                     <div>
                         <label className="block text-xs font-bold text-stone-500 mb-2 uppercase tracking-widest">Teléfono de Contacto</label>
-                        <input 
-                            type="tel" 
+                        <input
+                            type="tel"
                             required
                             minLength={9}
                             placeholder="600 000 000"
-                            className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#30312E] outline-none transition-all"
+                            className="w-full px-4 py-3 rounded-xl border border-stone-100 focus:ring-2 focus:ring-[#30312E] outline-none transition-all bg-[#D4CDBC]"
                             value={datos.telefono}
-                            onChange={(e) => setDatos({...datos, telefono: e.target.value})}
+                            onChange={(e) => setDatos({ ...datos, telefono: e.target.value })}
                         />
                     </div>
 
                     <div>
                         <label className="block text-xs font-bold text-stone-500 mb-2 uppercase tracking-widest">Contraseña</label>
-                        <input 
-                            type="password" 
+                        <input
+                            type="password"
                             required
                             placeholder="••••••••"
-                            className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#30312E] outline-none transition-all"
+                            className="w-full px-4 py-3 rounded-xl border border-stone-100 focus:ring-2 focus:ring-[#30312E] outline-none transition-all bg-[#D4CDBC]"
                             value={datos.password}
-                            onChange={(e) => setDatos({...datos, password: e.target.value})}
+                            onChange={(e) => setDatos({ ...datos, password: e.target.value })}
                         />
                     </div>
 
                     <div>
                         <label className="block text-xs font-bold text-stone-500 mb-2 uppercase tracking-widest">Confirmar Contraseña</label>
-                        <input 
-                            type="password" 
+                        <input
+                            type="password"
                             required
                             placeholder="••••••••"
-                            className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#30312E] outline-none transition-all"
+                            className="w-full px-4 py-3 rounded-xl border border-stone-100 focus:ring-2 focus:ring-[#30312E] outline-none transition-all bg-[#D4CDBC]"
                             value={datos.confirmPassword}
-                            onChange={(e) => setDatos({...datos, confirmPassword: e.target.value})}
+                            onChange={(e) => setDatos({ ...datos, confirmPassword: e.target.value })}
                         />
                     </div>
 
-                    <button 
+                    <button
                         type="submit"
                         className="w-full bg-[#30312E] text-[#D3CCBC] py-4 rounded-xl font-bold text-lg hover:bg-[#4a4b46] transition-all transform hover:scale-[1.02] shadow-lg mt-4"
                     >

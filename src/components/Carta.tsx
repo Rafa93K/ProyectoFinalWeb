@@ -53,13 +53,13 @@ const Carta: React.FC = () => {
     if (!imagen) return '/Img/default.jpg';
     // Si ya es una URL completa, la dejamos tal cual
     if (imagen.startsWith('https')) return imagen;
-    
+
     return `https://rafa.cicloflorenciopintado.es/Img/${imagen}`;
   };
 
   const groupByType = () => {
     if (activeTab === 'Especial') return { 'Nuestros Especiales': productos };
-    
+
     const groups: { [key: string]: Producto[] } = {};
     productos.forEach(p => {
       const groupName = p.subtipo || 'General';
@@ -75,7 +75,7 @@ const Carta: React.FC = () => {
     <div className="flex-1 bg-[#D3CCBC] py-12 px-4 md:px-8">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-bold text-[#30312E] text-center mb-12 font-serif">Nuestra Selección</h1>
-        
+
         {/* Tabs */}
         <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-12 md:mb-16">
           {(['Carta', 'Vinos', 'Especial'] as const)
@@ -86,18 +86,17 @@ const Carta: React.FC = () => {
               return true;
             })
             .map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-6 py-2 md:px-8 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 transform hover:scale-105 shadow-md ${
-                activeTab === tab 
-                ? 'bg-[#30312E] text-[#D3CCBC]' 
-                : 'bg-white/50 text-[#30312E] hover:bg-white'
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-6 py-2 md:px-8 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 transform hover:scale-105 shadow-md ${activeTab === tab
+                    ? 'bg-[#30312E] text-[#D3CCBC]'
+                    : 'bg-white/50 text-[#30312E] hover:bg-white'
+                  }`}
+              >
+                {tab}
+              </button>
+            ))}
         </div>
 
         {loading ? (
@@ -119,12 +118,12 @@ const Carta: React.FC = () => {
                   {items.map((item) => (
                     <div key={item.id_producto} className="flex gap-4 bg-white/40 p-4 md:p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
                       <div className="w-20 h-20 md:w-32 md:h-32 shrink-0 overflow-hidden rounded-xl bg-white/20">
-                        <img 
-                          src={getImagePath(item.imagen)} 
-                          alt={item.nombre} 
+                        <img
+                          src={getImagePath(item.imagen)}
+                          alt={item.nombre}
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/Img/default.jpg';
+                            (e.target as HTMLImageElement).src = '/Img/default.jpg';
                           }}
                         />
                       </div>
@@ -147,7 +146,7 @@ const Carta: React.FC = () => {
           </div>
         )}
       </div>
-      
+
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(20px); }

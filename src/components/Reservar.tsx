@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+/**
+ * Componente Reservar: Gestiona el formulario de reservas del restaurante.
+ * Permite a los usuarios elegir fecha, hora (validada dinámicamente) y número de comensales.
+ */
 export const Reservar: React.FC = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -13,6 +16,7 @@ export const Reservar: React.FC = () => {
     });
     const [enviando, setEnviando] = useState(false);
     const [completado, setCompletado] = useState(false);
+    const [availableSlots, setAvailableSlots] = useState<string[]>([]);
 
     useEffect(() => {
         // Cargar datos de usuario si existe sesión
@@ -30,6 +34,56 @@ export const Reservar: React.FC = () => {
             }
         }
     }, []);
+
+    // Cálculo dinámico de horarios disponibles (Lógica estilo "AJAX" pero reactiva)
+    useEffect(() => {
+        if (!formData.fecha) {
+            setAvailableSlots([]);
+            return;
+        }
+
+        const [year, month, day] = formData.fecha.split('-').map(Number);
+        const date = new Date(year, month - 1, day);
+        const dayOfWeek = date.getDay(); // 0: Dom, 1: Lun, 2: Mar, 3: Mie, 4: Jue, 5: Vie, 6: Sab
+
+        // Martes Cerrado
+        if (dayOfWeek === 2) {
+            setAvailableSlots(['CERRADO']);
+            if (formData.hora) setFormData(prev => ({ ...prev, hora: '' }));
+            return;
+        }
+
+        const slots: string[] = [];
+        
+        // Almuerzo: 13:30 - 15:45 (Todos menos Martes)
+        for (let h = 13; h <= 15; h++) {
+            for (let m = 0; m < 60; m += 15) {
+                const time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                if (time >= "13:30" && time <= "15:45") {
+                    slots.push(time);
+                }
+            }
+        }
+
+        // Cena: Viernes (5) y Sábado (6) 20:30 - 22:45
+        if (dayOfWeek === 5 || dayOfWeek === 6) {
+            for (let h = 20; h <= 22; h++) {
+                for (let m = 0; m < 60; m += 15) {
+                    const time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                    if (time >= "20:30" && time <= "22:45") {
+                        slots.push(time);
+                    }
+                }
+            }
+        }
+
+        setAvailableSlots(slots);
+        
+        // Resetear hora si la seleccionada ya no es válida para el nuevo día
+        if (formData.hora && !slots.includes(formData.hora)) {
+            setFormData(prev => ({ ...prev, hora: '' }));
+        }
+    }, [formData.fecha]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -63,7 +117,6 @@ export const Reservar: React.FC = () => {
                 } catch(e) {}
             }
 
-            // Asumimos que el endpoint es guardarReserva.php siguiendo el patrón del proyecto
             const response = await fetch('https://rafa.cicloflorenciopintado.es/guardarReserva.php', {
                 method: 'POST',
                 body: data
@@ -88,8 +141,7 @@ export const Reservar: React.FC = () => {
     if (completado) {
         return (
             <div className="flex-1 bg-[#D3CCBC] flex items-center justify-center p-6">
-                <div className="bg-white p-12 rounded-3xl shadow-2xl text-center max-w-lg w-full animate-fadeIn">
-                    <div className="text-6xl mb-6">✨</div>
+                <div className="bg-[#D3CCBC] p-12 rounded-3xl shadow-2xl text-center max-w-lg w-full animate-fadeIn">
                     <h2 className="text-3xl font-serif font-bold text-[#30312E] mb-4">¡Reserva Confirmada!</h2>
                     <p className="text-stone-500 mb-8">Gracias, <span className="font-bold">{formData.nombre_cliente}</span>. Hemos recibido tu solicitud correctamente.</p>
                     <p className="text-sm text-stone-500 italic">Redirigiéndote a tu panel...</p>
@@ -101,7 +153,7 @@ export const Reservar: React.FC = () => {
     return (
         <div className="flex-1 bg-[#D3CCBC] py-12 px-4 md:py-20">
             <div className="max-w-2xl mx-auto">
-                <div className="bg-[#E2DBC9] rounded-[2rem] shadow-2xl overflow-hidden border border-white/20">
+                <div className="bg-[#E2DBC9] rounded-4xl shadow-2xl overflow-hidden border border-white/20">
                     {/* Header del Formulario */}
                     <div className="bg-[#30312E] p-10 text-center">
                         <h1 className="text-4xl font-serif font-bold text-[#D3CCBC] mb-2">Reserva tu Mesa</h1>
@@ -155,14 +207,29 @@ export const Reservar: React.FC = () => {
                             {/* Hora */}
                             <div className="space-y-2">
                                 <label className="text-sm uppercase tracking-widest font-bold text-stone-500 block ml-1">Hora Preferida</label>
-                                <input 
+                                <select 
                                     required
-                                    type="time" 
                                     name="hora"
                                     value={formData.hora}
                                     onChange={handleChange}
-                                    className="w-full px-5 py-4 rounded-2xl border border-stone-100 focus:border-[#30312E] focus:ring-2 focus:ring-[#30312E]/10 outline-none transition-all bg-[#d4cdbc] text-stone-800"
-                                />
+                                    disabled={!formData.fecha || availableSlots[0] === 'CERRADO'}
+                                    className={`w-full px-5 py-4 rounded-2xl border border-stone-100 focus:border-[#30312E] focus:ring-2 focus:ring-[#30312E]/10 outline-none transition-all bg-[#d4cdbc] text-stone-800 cursor-pointer ${
+                                        (!formData.fecha || availableSlots[0] === 'CERRADO') ? 'opacity-50 cursor-not-allowed' : ''
+                                    }`}
+                                >
+                                    {!formData.fecha ? (
+                                        <option value="">Selecciona fecha primero</option>
+                                    ) : availableSlots[0] === 'CERRADO' ? (
+                                        <option value="">MARTES CERRADO</option>
+                                    ) : (
+                                        <>
+                                            <option value="">-- Elige una hora --</option>
+                                            {availableSlots.map(slot => (
+                                                <option key={slot} value={slot}>{slot}</option>
+                                            ))}
+                                        </>
+                                    )}
+                                </select>
                             </div>
                         </div>
 
@@ -170,17 +237,17 @@ export const Reservar: React.FC = () => {
                             {/* Personas */}
                             <div className="space-y-2">
                                 <label className="text-sm uppercase tracking-widest font-bold text-stone-500 block ml-1">Comensales</label>
-                                <select 
+                                <input 
+                                    type="number"
                                     name="personas"
+                                    min="1"
+                                    max="50"
                                     value={formData.personas}
                                     onChange={handleChange}
-                                    className="w-full px-5 py-4 rounded-2xl border border-stone-100 focus:border-[#30312E] focus:ring-2 focus:ring-[#30312E]/10 outline-none transition-all bg-[#d4cdbc] text-stone-800 appearance-none cursor-pointer"
-                                >
-                                    {[1,2,3,4,5,6,7,8,9,10].map(n => (
-                                        <option key={n} value={n}>{n} {n === 1 ? 'persona' : 'personas'}</option>
-                                    ))}
-                                    <option value="11">+10 (Llamar al local)</option>
-                                </select>
+                                    className="w-full px-5 py-4 rounded-2xl border border-stone-100 focus:border-[#30312E] focus:ring-2 focus:ring-[#30312E]/10 outline-none transition-all bg-[#d4cdbc] text-stone-800"
+                                    placeholder="2"
+                                    required
+                                />
                             </div>
 
                             {/* Observaciones placeholder */}

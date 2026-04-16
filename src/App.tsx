@@ -12,7 +12,7 @@ import LoginNav from './components/LoginNav';
 import Registro from './components/Registro';
 import Login from './components/Login';
 import PanelUsuario from './components/PanelUsuario';
-import {Reservar} from './components/Reservar';
+import { Reservar } from './components/Reservar';
 
 
 
@@ -22,9 +22,9 @@ const Home = () => {
     <main className="flex-1">
       {/* Sección Hero: El Salón */}
       <section className="relative h-[60vh] md:h-[70vh] overflow-hidden">
-        <img 
-          src="/Img/salon.jpg" 
-          alt="Nuestro Salón" 
+        <img
+          src="/Img/salon.jpg"
+          alt="Nuestro Salón"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center p-4">
@@ -54,9 +54,9 @@ const Home = () => {
         </div>
         <div className="flex-1 order-1 md:order-2">
           <div className="rounded-2xl overflow-hidden shadow-2xl transition-transform duration-500 hover:scale-[1.02]">
-            <img 
-              src="/Img/puerta.jpg" 
-              alt="Nuestra Entrada" 
+            <img
+              src="/Img/puerta.jpg"
+              alt="Nuestra Entrada"
               className="w-full h-auto object-cover"
             />
           </div>

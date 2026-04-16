@@ -33,36 +33,40 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         exit;
     }
 
-    // 4. Lógica de Horarios y Turnos
+    // 4. Lógica de Horarios y Turnos (Sincronizada con React)
     $capacidadMaxima = 50;
-    $diaSemana = date('N', strtotime($fecha)); 
+    $diaSemana = date('N', strtotime($fecha)); // 1 (Lu) a 7 (Dom)
     $esMediodia = false;
     $esNoche = false;
     $inicioTurno = '';
     $finTurno = '';
 
-    if ($hora >= '13:30' && $hora <= '15:30') {
+    // Almuerzo: 13:30 - 15:45 (Todos menos Martes)
+    if ($hora >= '13:30' && $hora <= '15:45') {
         $inicioTurno = '13:30';
-        $finTurno = '15:30';
+        $finTurno = '15:45';
         $esMediodia = true;
-    } elseif ($hora >= '20:30' && $hora <= '22:30') {
+    } 
+    // Cena: 20:30 - 22:45 (Solo Viernes y Sábado)
+    elseif ($hora >= '20:30' && $hora <= '22:45') {
         $inicioTurno = '20:30';
-        $finTurno = '22:30';
+        $finTurno = '22:45';
         $esNoche = true;
     } else {
-        echo json_encode(["success" => false, "message" => "Horario fuera de servicio (13:30-15:30 o 20:30-22:30)."]);
+        echo json_encode(["success" => false, "message" => "El horario seleccionado no está disponible (Turnos: 13:30-15:45 o 20:30-22:45)."]);
         exit;
     }
 
     // Martes cerrado
     if ($diaSemana == 2) {
-        echo json_encode(["success" => false, "message" => "Los martes estamos cerrados por descanso."]);
+        echo json_encode(["success" => false, "message" => "Los martes estamos cerrados por descanso del personal."]);
         exit;
     }
 
     // Lunes, Miércoles, Jueves y Domingo -> Solo mediodía
-    if (in_array($diaSemana, [1, 3, 4, 7]) && $esNoche) {
-        echo json_encode(["success" => false, "message" => "En el día seleccionado solo abrimos al mediodía."]);
+    $diasSoloMediodia = [1, 3, 4, 7]; // 1:Lu, 3:Mi, 4:Ju, 7:Do
+    if (in_array($diaSemana, $diasSoloMediodia) && $esNoche) {
+        echo json_encode(["success" => false, "message" => "En el día seleccionado solo abrimos para almuerzos (mediodía)."]);
         exit;
     }
 

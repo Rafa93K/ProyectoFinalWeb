@@ -74,7 +74,7 @@ const AdminLogin: React.FC = () => {
             <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-[#30312E]/5 rounded-full blur-3xl" />
             <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-[#D3CCBC]/20 rounded-full blur-3xl" />
 
-            <div className="w-full max-w-md bg-white/80 backdrop-blur-md rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden border border-white/20 animate-fadeIn relative z-10">
+            <div className="w-full max-w-md bg-[#E2DBC9] backdrop-blur-md rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden border border-white/20 animate-fadeIn relative z-10">
                 <div className="bg-[#30312E] p-10 text-center relative overflow-hidden">
                     {/* Brillo decorativo */}
                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/10 to-transparent opacity-50" />
@@ -102,7 +102,7 @@ const AdminLogin: React.FC = () => {
                                 type="text" 
                                 required
                                 placeholder="Introduce tu nombre"
-                                className="w-full px-5 py-4 rounded-2xl border border-stone-200 focus:ring-2 focus:ring-[#30312E] focus:border-transparent outline-none transition-all bg-stone-50/50 group-hover:bg-white"
+                                className="w-full px-5 py-4 rounded-2xl border border-stone-200 focus:ring-2 focus:ring-[#30312E] focus:border-transparent outline-none transition-all bg-[#D4CDBC]"
                                 value={nombre}
                                 onChange={(e) => setNombre(e.target.value)}
                             />
@@ -116,7 +116,7 @@ const AdminLogin: React.FC = () => {
                                 type="password" 
                                 required
                                 placeholder="••••••••"
-                                className="w-full px-5 py-4 rounded-2xl border border-stone-200 focus:ring-2 focus:ring-[#30312E] focus:border-transparent outline-none transition-all bg-stone-50/50 group-hover:bg-white"
+                                className="w-full px-5 py-4 rounded-2xl border border-stone-200 focus:ring-2 focus:ring-[#30312E] focus:border-transparent outline-none transition-all bg-[#D4CDBC]"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                             />
