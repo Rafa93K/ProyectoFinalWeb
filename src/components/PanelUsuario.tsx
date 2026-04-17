@@ -15,7 +15,7 @@ const PanelUsuario: React.FC = () => {
     const [usuario, setUsuario] = useState<{ nombre: string, telefono: string } | null>(null);
     const [idAEliminar, setIdAEliminar] = useState<number | null>(null);
     const [confirmando, setConfirmando] = useState(false);
-    
+
     // Estados para la MODIFICACIÓN
     const [reservaEditando, setReservaEditando] = useState<Reserva | null>(null);
     const [formModificar, setFormModificar] = useState({
@@ -26,7 +26,7 @@ const PanelUsuario: React.FC = () => {
     });
     const [slotsModificar, setSlotsModificar] = useState<string[]>([]);
     const [guardandoModificacion, setGuardandoModificacion] = useState(false);
-    
+
     const navegar = useNavigate();
 
     useEffect(() => {
@@ -187,21 +187,21 @@ const PanelUsuario: React.FC = () => {
     }
 
     return (
-        <div className="flex-1 bg-[#D3CCBC] p-6 md:p-12">
+        <div className="flex-1 bg-[#D3CCBC] p-3 md:p-12">
             <div className="max-w-4xl mx-auto">
                 <header className="mb-10 text-center">
-                    <h1 className="text-4xl font-bold text-stone-800 mb-2 font-serif">Mis Reservas</h1>
-                    <p className="text-stone-500">Hola, <span className="font-bold text-[#30312E]">{usuario?.nombre}</span>. Aquí puedes gestionar tus próximas visitas.</p>
+                    <h1 className="text-2xl md:text-4xl font-bold text-stone-800 mb-2 font-serif">Mis Reservas</h1>
+                    <p className="text-sm text-stone-500">Hola, <span className="font-bold text-[#30312E]">{usuario?.nombre}</span>. Aquí puedes gestionar tus próximas visitas.</p>
                 </header>
 
                 {reservas.length === 0 ? (
-                    <div className="bg-[#e2dbc9] rounded-3xl p-12 text-center shadow-sm border border-stone-200">
-                        <img src="/calendar.svg" alt="Calendario" className="w-20 h-20 mx-auto mb-6 opacity-80" />
-                        <h3 className="text-xl font-bold text-stone-700 mb-2">No tienes reservas activas</h3>
-                        <p className="text-stone-500 mb-6">¿Te apetece disfrutar de nuestra cocina hoy?</p>
+                    <div className="bg-[#e2dbc9] rounded-3xl p-8 md:p-12 text-center shadow-sm border border-stone-200">
+                        <img src="/calendar.svg" alt="Calendario" className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-6 opacity-80" />
+                        <h3 className="text-lg md:text-xl font-bold text-stone-700 mb-2">No tienes reservas activas</h3>
+                        <p className="text-sm md:text-base text-stone-500 mb-6">¿Te apetece disfrutar de nuestra cocina hoy?</p>
                         <button
                             onClick={() => navegar('/reservar')}
-                            className="bg-[#30312E] text-[#D3CCBC] px-8 py-3 rounded-full font-bold hover:bg-[#4a4b46] transition-all"
+                            className="bg-[#30312E] text-[#D3CCBC] px-6 md:px-8 py-3 rounded-full text-sm md:text-base font-bold hover:bg-[#4a4b46] transition-all"
                         >
                             Hacer una Reserva
                         </button>
@@ -209,34 +209,50 @@ const PanelUsuario: React.FC = () => {
                 ) : (
                     <div className="grid gap-6">
                         {reservas.map(reserva => (
-                            <div key={reserva.id_reserva} className="bg-[#E2DBC9] rounded-2xl p-4 shadow-md border border-stone-100 flex flex-col md:flex-row justify-between items-center gap-4 hover:shadow-lg transition-shadow">
-                                <div className="flex items-center gap-4">
-                                    <div className="bg-[#D3CCBC] p-4 rounded-xl text-center min-w-[80px]">
-                                        <div className="text-xs font-bold text-stone-400 uppercase tracking-tighter">Personas</div>
-                                        <div className="text-2xl font-bold text-stone-800">{reserva.personas}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-lg font-bold text-stone-800 flex items-center gap-2">
-                                            <span>📅 {new Date(reserva.fecha).toLocaleDateString()}</span>
-                                            <span className="text-stone-300">|</span>
-                                            <span>🕒 {reserva.hora.substring(0, 5)}</span>
+                            <div key={reserva.id_reserva} className="bg-[#E2DBC9] rounded-2xl p-3 md:p-4 shadow-md border border-stone-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-lg transition-shadow overflow-hidden">
+                                <div className="flex-1 w-full flex flex-col gap-3">
+                                    <div className="flex flex-row flex-wrap items-start justify-between md:justify-start gap-3 md:gap-12">
+                                        {/* Elemento 1: PAX */}
+                                        <div className="flex flex-col items-center md:items-start min-w-[60px]">
+                                            <div className="bg-[#D3CCBC] px-2 py-0.5 rounded-lg text-[10px] font-bold text-[#30312E] uppercase mb-1 w-full text-center md:text-left">Personas</div>
+                                            <div className="text-xl md:text-2xl font-bold text-stone-800">{reserva.personas}</div>
                                         </div>
-                                        {reserva.mensaje && (
-                                            <p className="text-sm text-stone-500 mt-1 italic">"{reserva.mensaje}"</p>
-                                        )}
+                                        
+                                        {/* Elemento 2: Fecha */}
+                                        <div className="flex flex-col items-center md:items-start">
+                                            <div className="bg-[#D3CCBC] px-2 py-0.5 rounded-lg text-[10px] font-bold text-[#30312E] uppercase mb-1 w-full text-center md:text-left">Fecha</div>
+                                            <div className="text-sm md:text-base font-bold text-stone-800">
+                                                {new Date(reserva.fecha).toLocaleDateString()}
+                                            </div>
+                                        </div>
+
+                                        {/* Elemento 3: Hora */}
+                                        <div className="flex flex-col items-center md:items-start">
+                                            <div className="bg-[#D3CCBC] px-2 py-0.5 rounded-lg text-[10px] font-bold text-[#30312E] uppercase mb-1 w-full text-center md:text-left">Hora</div>
+                                            <div className="text-sm md:text-base font-bold text-stone-800">
+                                               {reserva.hora.substring(0, 5)}
+                                            </div>
+                                        </div>
                                     </div>
+
+                                    {reserva.mensaje && (
+                                        <div className="mt-1">
+                                            <div className="bg-[#D3CCBC] px-2 py-0.5 rounded-lg text-[10px] font-bold text-[#30312E] uppercase mb-1 inline-block">Observaciones</div>
+                                            <p className="text-xs md:text-sm text-stone-600 italic ml-1 leading-relaxed break-words">"{reserva.mensaje}"</p>
+                                        </div>
+                                    )}
                                 </div>
 
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 w-full md:w-auto border-t md:border-t-0 md:border-l border-stone-800/10 pt-4 md:pt-0 md:pl-6">
                                     <button
-                                        className="px-4 py-2 rounded-xl text-[#30312E] font-bold hover:bg-[#D3CCBC]/50 transition-colors border border-[#30312E]/10"
+                                        className="flex-1 md:flex-initial px-4 py-2.5 rounded-xl text-[#30312E] text-xs md:text-sm font-bold hover:bg-[#D3CCBC]/50 transition-colors border border-[#30312E]/10"
                                         onClick={() => abrirModificacion(reserva)}
                                     >
                                         ✏️ Modificar
                                     </button>
                                     <button
                                         onClick={() => eliminarReserva(reserva.id_reserva)}
-                                        className="px-4 py-2 rounded-xl text-red-800 font-bold hover:bg-red-50 transition-colors border border-red-100"
+                                        className="flex-1 md:flex-initial px-4 py-2.5 rounded-xl text-red-800 text-xs md:text-sm font-bold hover:bg-red-50 transition-colors border border-red-100"
                                     >
                                         🗑️ Cancelar
                                     </button>
@@ -260,21 +276,21 @@ const PanelUsuario: React.FC = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-xs uppercase font-bold text-stone-500 mb-1 block">Fecha</label>
-                                    <input 
-                                        type="date" 
+                                    <input
+                                        type="date"
                                         required
                                         min={new Date().toISOString().split('T')[0]}
                                         value={formModificar.fecha}
-                                        onChange={(e) => setFormModificar({...formModificar, fecha: e.target.value})}
+                                        onChange={(e) => setFormModificar({ ...formModificar, fecha: e.target.value })}
                                         className="w-full px-4 py-3 rounded-xl border border-stone-200 bg-[#D4CDBC] focus:ring-2 focus:ring-[#30312E]/10 outline-none"
                                     />
                                 </div>
                                 <div>
                                     <label className="text-xs uppercase font-bold text-stone-500 mb-1 block">Hora</label>
-                                    <select 
+                                    <select
                                         required
                                         value={formModificar.hora}
-                                        onChange={(e) => setFormModificar({...formModificar, hora: e.target.value})}
+                                        onChange={(e) => setFormModificar({ ...formModificar, hora: e.target.value })}
                                         disabled={!formModificar.fecha || slotsModificar[0] === 'CERRADO'}
                                         className="w-full px-4 py-3 rounded-xl border border-stone-200 bg-[#D4CDBC] outline-none"
                                     >
@@ -286,19 +302,19 @@ const PanelUsuario: React.FC = () => {
 
                             <div>
                                 <label className="text-xs uppercase font-bold text-stone-500 mb-1 block">Comensales</label>
-                                <input 
+                                <input
                                     type="number" min="1" max="50" required
                                     value={formModificar.personas}
-                                    onChange={(e) => setFormModificar({...formModificar, personas: parseInt(e.target.value)})}
+                                    onChange={(e) => setFormModificar({ ...formModificar, personas: parseInt(e.target.value) })}
                                     className="w-full px-4 py-3 rounded-xl border border-stone-200 bg-[#D4CDBC]"
                                 />
                             </div>
 
                             <div>
                                 <label className="text-xs uppercase font-bold text-stone-500 mb-1 block">Observaciones</label>
-                                <textarea 
+                                <textarea
                                     value={formModificar.mensaje}
-                                    onChange={(e) => setFormModificar({...formModificar, mensaje: e.target.value})}
+                                    onChange={(e) => setFormModificar({ ...formModificar, mensaje: e.target.value })}
                                     rows={3}
                                     className="w-full px-4 py-3 rounded-xl border border-stone-200 bg-[#D4CDBC] resize-none"
                                 />

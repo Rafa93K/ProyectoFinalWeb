@@ -35,7 +35,7 @@ export const Reservar: React.FC = () => {
         }
     }, []);
 
-    // Cálculo dinámico de horarios disponibles (Lógica estilo "AJAX" pero reactiva)
+    // Cálculo dinámico de horarios disponibles
     useEffect(() => {
         if (!formData.fecha) {
             setAvailableSlots([]);
