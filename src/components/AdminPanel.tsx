@@ -79,13 +79,7 @@ const PanelAdmin: React.FC = () => {
   const obtenerProductos = async () => {
     setCargando(true);
     try {
-      /* 
-         CONEXIÓN CON BASE DE DATOS:
-         Aquí iría la llamada a tu API PHP para obtener todos los productos.
-         Ej: const respuesta = await fetch('http://localhost/proyectoWeb/backend/getProductos.php?tipo=all');
-      */
-
-      // Realizamos la petición (sustituir URL por la real en producción)
+      
       const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/getProductos.php?tipo=all');
       const datos = await respuesta.json();
       setListaProductos(Array.isArray(datos) ? datos : []);
@@ -115,13 +109,11 @@ const PanelAdmin: React.FC = () => {
 
       if (resultado.success) {
         setMostrarEspeciales(nuevoEstado);
-        alert(`Sección de Especiales: ${nuevoEstado ? 'Visible' : 'Oculta'} (Actualizado en BD)`);
       } else {
         alert('Error al actualizar en la base de datos');
       }
     } catch (error) {
-      console.error('Error al sincronizar con el servidor:', error);
-      alert('Error de conexión');
+      console.error('Error al sincronizar con el servidor');
     }
   };
 
@@ -131,16 +123,24 @@ const PanelAdmin: React.FC = () => {
   const eliminarProducto = async (id: number) => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este producto permanentemente?')) {
       try {
-        /* 
-           CONEXIÓN CON BASE DE DATOS:
-           Ej: await fetch(`http://localhost/proyectoWeb/backend/eliminarProducto.php?id=${id}`, { method: 'DELETE' });
-        */
-        console.log('Eliminando producto con ID:', id);
+        const formData = new FormData();
+        formData.append('id_producto', id.toString());
 
-        // Actualizamos la lista local eliminando el producto para efecto inmediato
-        setListaProductos(listaProductos.filter(p => p.id_producto !== id));
+        const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/eliminarProducto.php', {
+          method: 'POST',
+          body: formData
+        });
+
+        const resultado = await respuesta.json();
+        
+        if (resultado.success) {
+          setListaProductos(listaProductos.filter(p => p.id_producto !== id));
+        } else {
+          alert(resultado.message || 'Error al eliminar el producto');
+        }
       } catch (error) {
-        console.error('Error al intentar eliminar:', error);
+        console.error('Error al intentar eliminar');
+        alert('Error de conexión al eliminar');
       }
     }
   };
@@ -148,28 +148,45 @@ const PanelAdmin: React.FC = () => {
   /**
    * Función que se ejecuta al enviar el formulario (Crear o Editar)
    */
-  const guardarCambios = async (e: React.FormEvent) => {
-    e.preventDefault(); // Evita que la página se recargue
+  const guardarCambios = async (e: React.SubmitEvent) => {
+    e.preventDefault(); 
     try {
+      // Determinamos el script a llamar según si estamos editando o creando
+      const url = productoEditando 
+        ? 'https://rafa.cicloflorenciopintado.es/actualizarProducto.php' 
+        : 'https://rafa.cicloflorenciopintado.es/insertarProducto.php';
+
+      const formData = new FormData();
+      
+      // Si editamos, necesitamos enviar el ID
       if (productoEditando) {
-        /* 
-           MODIFICAR PRODUCTO EXISTENTE:
-           Aquí harías un POST a tu backend con los datos actualizados y el ID.
-        */
-        console.log('Actualizando producto con ID:', productoEditando.id_producto, datosFormulario);
-      } else {
-        /* 
-           CREAR NUEVO PRODUCTO:
-           Aquí harías un POST a tu backend para insertar el nuevo producto.
-        */
-        console.log('Insertando nuevo producto:', datosFormulario);
+        formData.append('id_producto', productoEditando.id_producto.toString());
       }
 
-      setModalAbierto(false); // Cerramos el modal
-      setProductoEditando(null); // Limpiamos el producto en edición
-      obtenerProductos(); // Refrescamos la tabla con los datos del servidor
+      formData.append('nombre', datosFormulario.nombre);
+      formData.append('descripcion', datosFormulario.descripcion);
+      formData.append('precio', datosFormulario.precio.toString());
+      formData.append('tipo', datosFormulario.tipo);
+      formData.append('subtipo', datosFormulario.subtipo);
+      formData.append('imagen', datosFormulario.imagen); // Enviamos el Base64 o URL
+
+      const respuesta = await fetch(url, {
+        method: 'POST',
+        body: formData
+      });
+
+      const resultado = await respuesta.json();
+
+      if (resultado.success) {
+        setModalAbierto(false); 
+        setProductoEditando(null); 
+        obtenerProductos(); // Recargamos la lista desde el servidor
+      } else {
+        alert(resultado.message || 'Error al guardar los cambios');
+      }
     } catch (error) {
       console.error('Error al guardar cambios:', error);
+      alert('Error de conexión al servidor');
     }
   };
 
@@ -209,14 +226,13 @@ const PanelAdmin: React.FC = () => {
    * Gestiona la selección de archivos de imagen y genera la previsualización
    */
   const manejarCambioImagen = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const archivo = e.target.files?.[0]; // Obtenemos el primer archivo seleccionado
+    const archivo = e.target.files?.[0]; 
     if (archivo) {
-      const lector = new FileReader(); // Objeto para leer archivos
+      const lector = new FileReader(); 
       lector.onloadend = () => {
-        // Guardamos el contenido de la imagen en base64 para la previsualización
         setDatosFormulario({ ...datosFormulario, imagen: lector.result as string });
       };
-      lector.readAsDataURL(archivo); // Iniciamos la lectura
+      lector.readAsDataURL(archivo); 
     }
   };
 
@@ -289,85 +305,85 @@ const PanelAdmin: React.FC = () => {
           </div>
         </header>
 
-        {/* LISTADO DE PRODUCTOS */}
+        {/* LISTADO DE PRODUCTOS (VISTA DE REJILLA) */}
         {cargando ? (
           <div className="flex flex-col items-center justify-center py-32 space-y-4">
              <div className="w-12 h-12 border-4 border-[#30312E]/20 border-t-[#30312E] rounded-full animate-spin"></div>
              <p className="text-[#30312E] font-serif italic text-xl">Cargando inventario...</p>
           </div>
         ) : (
-          <div className="bg-[#E2DBC9] rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-[#30312E] text-[#D3CCBC]">
-                    <th className="px-8 py-6 font-bold uppercase text-xs tracking-widest">Plato / Descripción</th>
-                    <th className="px-8 py-6 font-bold uppercase text-xs tracking-widest">Categorización</th>
-                    <th className="px-8 py-6 font-bold uppercase text-xs tracking-widest">Precio</th>
-                    <th className="px-8 py-6 font-bold uppercase text-xs tracking-widest text-right">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#30312E]/5">
-                  {listaProductos.length > 0 ? (
-                    listaProductos.map((prod) => (
-                      <tr key={prod.id_producto} className="hover:bg-white/30 transition-colors group">
-                        <td className="px-8 py-6">
-                          <div className="flex items-center gap-5">
-                            <div className="relative">
-                              <img
-                                src={prod.imagen || '/Img/default.jpg'}
-                                alt={prod.nombre}
-                                className="w-16 h-16 rounded-2xl object-cover shadow-lg border-2 border-white/50 group-hover:scale-110 transition-transform duration-300"
-                              />
-                              {prod.tipo === 'especial' && (
-                                <span className="absolute -top-2 -right-2 bg-yellow-500 text-white text-[10px] font-black px-2 py-1 rounded-full shadow-md animate-pulse">🌟</span>
-                              )}
-                            </div>
-                            <div>
-                              <div className="font-bold text-[#30312E] text-lg font-serif">{prod.nombre}</div>
-                              <div className="text-xs text-[#30312E]/60 mt-1 max-w-[300px] line-clamp-2 md:line-clamp-none">{prod.descripcion}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-8 py-6">
-                          <div className="flex flex-col gap-1">
-                            <span className="px-3 py-1 bg-[#30312E] text-[#D3CCBC] rounded-lg text-[10px] font-black uppercase tracking-wider w-fit">{prod.tipo}</span>
-                            <span className="text-xs font-bold text-[#30312E]/40 italic ml-1">{prod.subtipo}</span>
-                          </div>
-                        </td>
-                        <td className="px-8 py-6">
-                          <span className="text-xl font-bold text-[#30312E]">{prod.precio}<small className="text-sm ml-0.5">€</small></span>
-                        </td>
-                        <td className="px-8 py-6">
-                          <div className="flex justify-end gap-3">
-                            <button
-                              onClick={() => abrirModalEdicion(prod)}
-                              className="w-12 h-12 flex items-center justify-center bg-white/50 text-[#30312E] hover:bg-[#30312E] hover:text-[#D3CCBC] rounded-2xl transition-all shadow-sm border border-white/80"
-                              title="Editar"
-                            >
-                              ✏️
-                            </button>
-                            <button
-                              onClick={() => eliminarProducto(prod.id_producto)}
-                              className="w-12 h-12 flex items-center justify-center bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-2xl transition-all shadow-sm border border-red-100"
-                              title="Eliminar"
-                            >
-                              🗑️
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={4} className="px-8 py-20 text-center text-[#30312E]/40 italic font-serif text-xl">
-                        No hay productos registrados en esta sección.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {listaProductos.length > 0 ? (
+              listaProductos.map((prod) => (
+                <div key={prod.id_producto} className="bg-[#E2DBC9] rounded-4xl overflow-hidden shadow-lg border border-white/40 hover:shadow-2xl transition-all group flex flex-col relative">
+                  {/* IMAGEN Y ACCIONES RÁPIDAS */}
+                  <div className="relative h-56 overflow-hidden">
+                    <img
+                      src={prod.imagen || '/Img/default.jpg'}
+                      alt={prod.nombre}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-[#30312E]/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    
+                    {/* Botones Flotantes */}
+                    <div className="absolute top-4 right-4 flex flex-col gap-2 transform translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
+                      <button
+                        onClick={() => abrirModalEdicion(prod)}
+                        className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-[#30312E] hover:text-[#D3CCBC] transition-all"
+                        title="Editar"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => eliminarProducto(prod.id_producto)}
+                        className="w-10 h-10 bg-red-100/90 backdrop-blur-sm text-red-600 rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 hover:text-white transition-all underline-none"
+                        title="Eliminar"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+
+                    {/* Badge de Tipo */}
+                    <div className="absolute top-4 left-4">
+                      <span className="px-3 py-1 bg-[#30312E] text-[#D3CCBC] rounded-full text-[10px] font-black uppercase tracking-widest shadow-md">
+                        {prod.tipo}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* INFO DEL PRODUCTO */}
+                  <div className="p-6 flex-1 flex flex-col">
+                    <div className="flex justify-between items-start mb-3 gap-2">
+                      <h3 className="font-bold text-[#30312E] text-xl font-serif leading-tight line-clamp-2">{prod.nombre}</h3>
+                      <span className="bg-[#30312E] text-[#D3CCBC] px-3 py-1 rounded-xl font-bold text-sm whitespace-nowrap shadow-sm">
+                        {prod.precio}€
+                      </span>
+                    </div>
+                    
+                    <p className="text-xs text-[#30312E]/60 mb-6 flex-1 italic line-clamp-3">
+                      "{prod.descripcion}"
+                    </p>
+
+                    <div className="flex items-center justify-between border-t border-[#30312E]/10 pt-4 mt-auto">
+                      <span className="text-[10px] font-black text-[#30312E]/30 uppercase tracking-[0.2em]">
+                        {prod.subtipo || 'S/C'}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                        <span className="text-[9px] font-bold text-green-700 uppercase">Activo</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full bg-white/10 rounded-[3rem] py-20 text-center border-2 border-dashed border-white/20">
+                <span className="text-5xl block mb-6 opacity-30">🍽️</span>
+                <p className="text-[#30312E]/40 italic font-serif text-2xl">
+                  No hay productos registrados en esta sección.
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
