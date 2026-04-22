@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Buscamos al usuario por su teléfono
-        $sql = "SELECT nombre, contrasena FROM Usuario WHERE telefono = :tel LIMIT 1";
+        $sql = "SELECT id_usuario, nombre, contrasena FROM Usuario WHERE telefono = :tel LIMIT 1";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['tel' => $telefono]);
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -28,7 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo json_encode([
                     "success" => true, 
                     "message" => "¡Bienvenido de nuevo!",
-                    "nombre" => $usuario['nombre']
+                    "nombre" => $usuario['nombre'],
+                    "id_usuario" => $usuario['id_usuario']
                 ]);
             } else {
                 echo json_encode(["success" => false, "message" => "La contraseña es incorrecta"]);

@@ -52,7 +52,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         if ($resultado) {
-            echo json_encode(["success" => true, "message" => "¡Registro completado!"]);
+            $id_usuario = $pdo->lastInsertId();
+            echo json_encode([
+                "success" => true, 
+                "message" => "¡Registro completado!",
+                "id_usuario" => $id_usuario
+            ]);
         } else {
             echo json_encode(["success" => false, "message" => "Error al guardar en la base de datos"]);
         }

@@ -44,6 +44,7 @@ const Registro: React.FC = () => {
                 alert(result.message);
                 // Guardamos el objeto usuario en localStorage para iniciar sesión automáticamente
                 const usuarioData = {
+                    id_usuario: result.id_usuario,
                     nombre: datos.nombre,
                     telefono: datos.telefono
                 };

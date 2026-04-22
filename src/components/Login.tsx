@@ -27,6 +27,7 @@ const Login: React.FC = () => {
             if (result.success) {
                 // Guardamos el objeto usuario limpio en localStorage
                 const usuarioData = {
+                    id_usuario: result.id_usuario,
                     nombre: typeof result.nombre === 'object' ? result.nombre.nombre : result.nombre,
                     telefono: telefono
                 };

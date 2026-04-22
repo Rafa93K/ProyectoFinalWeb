@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const LoginNav = () => {
-  const [usuario, setUsuario] = useState<{ nombre: string, telefono: string } | null>(null);
+  const [usuario, setUsuario] = useState<{ id_usuario: string, nombre: string, telefono: string } | null>(null);
   const navegar = useNavigate();
 
   useEffect(() => {

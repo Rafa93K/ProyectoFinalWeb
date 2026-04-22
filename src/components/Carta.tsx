@@ -8,6 +8,9 @@ interface Producto {
   tipo: string;
   subtipo: string;
   imagen: string;
+  total_votos?: number;
+  media_votos?: number;
+  mi_puntuacion?: number | null;
 }
 
 const Carta: React.FC = () => {
@@ -15,9 +18,22 @@ const Carta: React.FC = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [mostrarEspeciales, setMostrarEspeciales] = useState(true);
+  const [usuario, setUsuario] = useState<{ id_usuario: string, nombre: string } | null>(null);
 
   useEffect(() => {
-    fetchProductos(activeTab);
+    const sesionRaw = localStorage.getItem('usuarioSesion');
+    let userId = null;
+    if (sesionRaw) {
+      try {
+        const u = JSON.parse(sesionRaw);
+        setUsuario(u);
+        userId = u.id_usuario;
+      } catch (e) {
+        console.error('Error al parsear sesión');
+      }
+    }
+    
+    fetchProductos(activeTab, userId);
     fetchConfig();
   }, [activeTab]);
 
@@ -33,12 +49,13 @@ const Carta: React.FC = () => {
     }
   };
 
-  const fetchProductos = async (tipo: string) => {
+  const fetchProductos = async (tipo: string, userId?: string | null) => {
     setLoading(true);
     try {
-      const response = await fetch(`https://rafa.cicloflorenciopintado.es/getProductos.php?tipo=${tipo}`);
+      const id_u = userId || usuario?.id_usuario || '';
+      const url = `https://rafa.cicloflorenciopintado.es/getProductos.php?tipo=${tipo}${id_u ? `&id_usuario=${id_u}` : ''}`;
+      const response = await fetch(url);
       const data = await response.json();
-      console.log('Productos cargados:', data);
       setProductos(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching productos:', error);
@@ -48,10 +65,40 @@ const Carta: React.FC = () => {
     }
   };
 
-  // Función auxiliar para obtener la ruta correcta de la imagen
+  const manejarVoto = async (id_producto: number, puntuacion: number) => {
+    if (!usuario) {
+      alert('Debes iniciar sesión para puntuar');
+      return;
+    }
+
+    if (!usuario.id_usuario) {
+      alert('Tu sesión no tiene un ID de usuario válido. Por favor, cierra sesión y vuelve a entrar.');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('id_usuario', usuario.id_usuario);
+      formData.append('id_producto', id_producto.toString());
+      formData.append('puntuacion', puntuacion.toString());
+
+      const response = await fetch('https://rafa.cicloflorenciopintado.es/votar.php', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        fetchProductos(activeTab);
+      }
+    } catch (error) {
+      console.error('Error al votar:', error);
+    }
+  };
+
   const getImagePath = (imagen: string) => {
     if (!imagen) return '/Img/default.jpg';
-    // Si ya es una URL completa, la dejamos tal cual
     if (imagen.startsWith('https')) return imagen;
 
     return `https://rafa.cicloflorenciopintado.es/Img/${imagen}`;
@@ -79,19 +126,14 @@ const Carta: React.FC = () => {
         {/* Tabs */}
         <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-12 md:mb-16">
           {(['Carta', 'Vinos', 'Especial'] as const)
-            .filter(tab => {
-              if (tab === 'Especial') {
-                return mostrarEspeciales;
-              }
-              return true;
-            })
+            .filter(tab => tab !== 'Especial' || mostrarEspeciales)
             .map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-6 py-2 md:px-8 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 transform hover:scale-105 shadow-md ${activeTab === tab
-                    ? 'bg-[#30312E] text-[#D3CCBC]'
-                    : 'bg-white/50 text-[#30312E] hover:bg-white'
+                  ? 'bg-[#30312E] text-[#D3CCBC]'
+                  : 'bg-white/50 text-[#30312E] hover:bg-white'
                   }`}
               >
                 {tab}
@@ -116,27 +158,57 @@ const Carta: React.FC = () => {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {items.map((item) => (
-                    <div key={item.id_producto} className="flex gap-4 bg-white/40 p-4 md:p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                    <div key={item.id_producto} className="flex gap-4 bg-white/40 p-4 md:p-6 rounded-2xl shadow-sm hover:shadow-md transition-all group overflow-hidden">
                       <div className="w-20 h-20 md:w-32 md:h-32 shrink-0 overflow-hidden rounded-xl bg-white/20">
                         <img
                           src={getImagePath(item.imagen)}
                           alt={item.nombre}
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/Img/default.jpg';
-                          }}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/Img/default.jpg'; }}
                         />
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 flex flex-col">
                         <div className="flex justify-between items-start mb-2">
                           <h3 className="text-xl font-bold text-[#30312E] leading-tight">{item.nombre}</h3>
                           <span className="text-lg font-bold text-[#30312E] ml-4">
                             {typeof item.precio === 'string' ? parseFloat(item.precio).toFixed(2) : item.precio}€
                           </span>
                         </div>
-                        <p className="text-[#30312E]/70 text-sm md:text-base leading-relaxed">
+                        <p className="text-[#30312E]/70 text-xs md:text-sm leading-relaxed mb-4 line-clamp-2 md:line-clamp-none">
                           {item.descripcion}
                         </p>
+                        
+                        {/* Rating Section */}
+                        <div className="mt-auto flex flex-col md:flex-row md:items-center justify-between gap-2 border-t border-[#30312E]/5 pt-3">
+                          <div className="flex items-center gap-1.5">
+                            <div className="flex">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                  key={star}
+                                  onClick={() => manejarVoto(item.id_producto, star)}
+                                  disabled={!usuario}
+                                  className={`text-lg md:text-xl transition-all duration-200 transform ${
+                                    usuario ? 'hover:scale-125 active:scale-95' : 'cursor-default'
+                                  } ${
+                                    (item.mi_puntuacion && star <= (item.mi_puntuacion as number))
+                                    ? 'text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.3)]'
+                                    : 'text-stone-300'
+                                  }`}
+                                  title={usuario ? `Puntuar con ${star} estrellas` : 'Inicia sesión para puntuar'}
+                                >
+                                  ★
+                                </button>
+                              ))}
+                            </div>
+                            <span className="text-[10px] md:text-xs font-bold text-[#30312E]/50 uppercase tracking-widest ml-1">
+                              {item.media_votos || '0.0'} ({item.total_votos || 0})
+                            </span>
+                          </div>
+                          
+                          {!usuario && (
+                            <span className="text-[9px] uppercase tracking-tighter font-bold text-[#30312E]/30">Accede para puntuar</span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}

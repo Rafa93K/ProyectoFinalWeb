@@ -126,7 +126,7 @@ export const Reservar: React.FC = () => {
             if (result.success) {
                 setCompletado(true);
                 // Redirigir tras un breve retraso
-                setTimeout(() => navigate('/carta'), 3000);
+                setTimeout(() => navigate('/mis-reservas'), 3000);
             } else {
                 alert(result.message || 'Hubo un error al procesar tu reserva. Inténtalo de nuevo.');
             }
