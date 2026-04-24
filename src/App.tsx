@@ -14,6 +14,10 @@ import Login from './components/Login';
 import PanelUsuario from './components/PanelUsuario';
 import { Reservar } from './components/Reservar';
 
+/**
+ * Componente de la Página de Inicio (Home)
+ * Muestra las secciones principales de bienvenida y experiencia.
+ */
 const Home = () => {
   return (
     <main className="flex-1">
@@ -68,15 +72,23 @@ const Home = () => {
   );
 };
 
+/**
+ * Componente Principal App
+ * Gestiona el enrutamiento y la estructura base del sitio.
+ */
 function App() {
-  const location = useLocation();
-  const esAdmin = location.pathname.startsWith('/admin');
+  const ubicacion = useLocation();
+  // Comprobar si estamos en la zona de administración
+  const esAdmin = ubicacion.pathname.startsWith('/admin');
 
   return (
     <div className="min-h-screen bg-[#D3CCBC] flex flex-col font-serif">
       <Header />
+      {/* Mostrar la navegación de login si no estamos en admin */}
       {!esAdmin && <LoginNav />}
+      
       <Routes>
+        {/* Rutas Públicas */}
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
         <Route path="/carta" element={<Carta />} />
@@ -86,13 +98,18 @@ function App() {
         <Route path="/aviso-legal" element={<AvisoLegal />} />
         <Route path="/privacidad" element={<Privacidad />} />
         <Route path="/cookies" element={<Cookies />} />
+        
+        {/* Rutas de Administración */}
         <Route path="/admin" element={
           localStorage.getItem('adminSesion') ? <PanelAdmin /> : <AdminLogin />
         } />
         <Route path="/admin/login" element={<AdminLogin />} />
+        
+        {/* Rutas de Usuario */}
         <Route path="/registro" element={<Registro />} />
         <Route path="/login" element={<Login />} />
       </Routes>
+      
       <Footer />
     </div>
   )

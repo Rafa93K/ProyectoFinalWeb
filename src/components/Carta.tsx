@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
+// Interfaz para definir la estructura de un producto
 interface Producto {
   id_producto: number;
   nombre: string;
@@ -14,13 +15,17 @@ interface Producto {
 }
 
 const Carta: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'Carta' | 'Vinos' | 'Especial'>('Carta');
+  // --- Estados de la aplicación ---
+  const [pestanaActiva, setPestanaActiva] = useState<'Carta' | 'Vinos' | 'Especial'>('Carta');
   const [productos, setProductos] = useState<Producto[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [cargando, setCargando] = useState(true);
   const [mostrarEspeciales, setMostrarEspeciales] = useState(true);
   const [usuario, setUsuario] = useState<{ id_usuario: string, nombre: string } | null>(null);
+  const [mostrarBotonArriba, setMostrarBotonArriba] = useState(false);
 
+  // --- Efectos ---
   useEffect(() => {
+    // Recuperar sesión del usuario desde el almacenamiento local
     const sesionRaw = localStorage.getItem('usuarioSesion');
     let userId = null;
     if (sesionRaw) {
@@ -33,38 +38,60 @@ const Carta: React.FC = () => {
       }
     }
     
-    fetchProductos(activeTab, userId);
-    fetchConfig();
-  }, [activeTab]);
+    // Cargar productos y configuración inicial
+    obtenerProductos(pestanaActiva, userId);
+    obtenerConfiguracion();
 
-  const fetchConfig = async () => {
+    // Gestor de desplazamiento para mostrar/ocultar el botón de "subir"
+    const manejarDesplazamiento = () => {
+      setMostrarBotonArriba(window.scrollY > 400);
+    };
+
+    window.addEventListener('scroll', manejarDesplazamiento);
+    return () => window.removeEventListener('scroll', manejarDesplazamiento);
+  }, [pestanaActiva]);
+
+  // --- Funciones de utilidad ---
+
+  // Desplaza la ventana hacia la parte superior suavemente
+  const irHaciaArriba = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  // Obtiene la configuración del administrador (ej. si se muestran los especiales)
+  const obtenerConfiguracion = async () => {
     try {
-      const response = await fetch('https://rafa.cicloflorenciopintado.es/getAdminConfig.php');
-      const data = await response.json();
-      if (data.success) {
-        setMostrarEspeciales(data.especials === 1 || data.especials === true);
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/getAdminConfig.php');
+      const datos = await respuesta.json();
+      if (datos.success) {
+        setMostrarEspeciales(datos.especials === 1 || datos.especials === true);
       }
     } catch (error) {
-      console.error('Error fetching config:', error);
+      console.error('Error al obtener la configuración:', error);
     }
   };
 
-  const fetchProductos = async (tipo: string, userId?: string | null) => {
-    setLoading(true);
+  // Obtiene la lista de productos según el tipo seleccionado
+  const obtenerProductos = async (tipo: string, userId?: string | null) => {
+    setCargando(true);
     try {
       const id_u = userId || usuario?.id_usuario || '';
       const url = `https://rafa.cicloflorenciopintado.es/getProductos.php?tipo=${tipo}${id_u ? `&id_usuario=${id_u}` : ''}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      setProductos(Array.isArray(data) ? data : []);
+      const respuesta = await fetch(url);
+      const datos = await respuesta.json();
+      setProductos(Array.isArray(datos) ? datos : []);
     } catch (error) {
-      console.error('Error fetching productos:', error);
+      console.error('Error al obtener productos:', error);
       setProductos([]);
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
+  // Maneja la votación de un producto por parte del usuario
   const manejarVoto = async (id_producto: number, puntuacion: number) => {
     if (!usuario) {
       alert('Debes iniciar sesión para puntuar');
@@ -82,56 +109,59 @@ const Carta: React.FC = () => {
       formData.append('id_producto', id_producto.toString());
       formData.append('puntuacion', puntuacion.toString());
 
-      const response = await fetch('https://rafa.cicloflorenciopintado.es/votar.php', {
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/votar.php', {
         method: 'POST',
         body: formData
       });
       
-      const data = await response.json();
+      const datos = await respuesta.json();
       
-      if (data.success) {
-        fetchProductos(activeTab);
+      if (datos.success) {
+        // Recargar productos para actualizar las medias de votos
+        obtenerProductos(pestanaActiva);
       }
     } catch (error) {
       console.error('Error al votar:', error);
     }
   };
 
-  const getImagePath = (imagen: string) => {
+  // Construye la URL completa de la imagen del producto
+  const obtenerRutaImagen = (imagen: string) => {
     if (!imagen) return '/Img/default.jpg';
     if (imagen.startsWith('https')) return imagen;
 
     return `https://rafa.cicloflorenciopintado.es/Img/${imagen}`;
   };
 
-  const groupByType = () => {
-    if (activeTab === 'Especial') return { 'Nuestros Especiales': productos };
+  // Agrupa los productos por su subtipo (ej. entrantes, carnes, etc.)
+  const agruparPorTipo = () => {
+    if (pestanaActiva === 'Especial') return { 'Nuestros Especiales': productos };
 
-    const groups: { [key: string]: Producto[] } = {};
+    const grupos: { [key: string]: Producto[] } = {};
     productos.forEach(p => {
-      const groupName = p.subtipo || 'General';
-      if (!groups[groupName]) groups[groupName] = [];
-      groups[groupName].push(p);
+      const nombreGrupo = p.subtipo || 'General';
+      if (!grupos[nombreGrupo]) grupos[nombreGrupo] = [];
+      grupos[nombreGrupo].push(p);
     });
-    return groups;
+    return grupos;
   };
 
-  const groupedProductos = groupByType();
+  const productosAgrupados = agruparPorTipo();
 
   return (
     <div className="flex-1 bg-[#D3CCBC] py-12 px-4 md:px-8">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-bold text-[#30312E] text-center mb-12 font-serif">Nuestra Selección</h1>
 
-        {/* Tabs */}
+        {/* --- Pestañas de Navegación --- */}
         <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-12 md:mb-16">
           {(['Carta', 'Vinos', 'Especial'] as const)
             .filter(tab => tab !== 'Especial' || mostrarEspeciales)
             .map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-6 py-2 md:px-8 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 transform hover:scale-105 shadow-md ${activeTab === tab
+                onClick={() => setPestanaActiva(tab)}
+                className={`px-6 py-2 md:px-8 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 transform hover:scale-105 shadow-md ${pestanaActiva === tab
                   ? 'bg-[#30312E] text-[#D3CCBC]'
                   : 'bg-white/50 text-[#30312E] hover:bg-white'
                   }`}
@@ -141,17 +171,21 @@ const Carta: React.FC = () => {
             ))}
         </div>
 
-        {loading ? (
+        {/* --- Contenido Principal --- */}
+        {cargando ? (
+          // Indicador de carga
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#30312E]"></div>
           </div>
-        ) : Object.keys(groupedProductos).length === 0 ? (
+        ) : Object.keys(productosAgrupados).length === 0 ? (
+          // Mensaje cuando no hay resultados
           <div className="text-center py-20">
             <p className="text-2xl text-[#30312E]/60 italic">No se han encontrado productos en esta categoría.</p>
           </div>
         ) : (
+          // Listado de productos agrupados
           <div className="space-y-16">
-            {Object.entries(groupedProductos).map(([subtipo, items]) => (
+            {Object.entries(productosAgrupados).map(([subtipo, items]) => (
               <div key={subtipo} className="animate-fadeIn">
                 <h2 className="text-3xl font-serif font-bold text-[#30312E] mb-8 border-b-2 border-[#30312E]/20 pb-2 capitalize">
                   {subtipo}
@@ -159,14 +193,16 @@ const Carta: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {items.map((item) => (
                     <div key={item.id_producto} className="flex gap-4 bg-white/40 p-4 md:p-6 rounded-2xl shadow-sm hover:shadow-md transition-all group overflow-hidden">
+                      {/* Imagen del producto */}
                       <div className="w-20 h-20 md:w-32 md:h-32 shrink-0 overflow-hidden rounded-xl bg-white/20">
                         <img
-                          src={getImagePath(item.imagen)}
+                          src={obtenerRutaImagen(item.imagen)}
                           alt={item.nombre}
                           className="w-full h-full object-cover"
                           onError={(e) => { (e.target as HTMLImageElement).src = '/Img/default.jpg'; }}
                         />
                       </div>
+                      {/* Información del producto */}
                       <div className="flex-1 flex flex-col">
                         <div className="flex justify-between items-start mb-2">
                           <h3 className="text-xl font-bold text-[#30312E] leading-tight">{item.nombre}</h3>
@@ -178,23 +214,23 @@ const Carta: React.FC = () => {
                           {item.descripcion}
                         </p>
                         
-                        {/* Rating Section */}
+                        {/* Sección de Puntuación (Estrellas) */}
                         <div className="mt-auto flex flex-col md:flex-row md:items-center justify-between gap-2 border-t border-[#30312E]/5 pt-3">
                           <div className="flex items-center gap-1.5">
                             <div className="flex">
-                              {[1, 2, 3, 4, 5].map((star) => (
+                              {[1, 2, 3, 4, 5].map((estrella) => (
                                 <button
-                                  key={star}
-                                  onClick={() => manejarVoto(item.id_producto, star)}
+                                  key={estrella}
+                                  onClick={() => manejarVoto(item.id_producto, estrella)}
                                   disabled={!usuario}
                                   className={`text-lg md:text-xl transition-all duration-200 transform ${
                                     usuario ? 'hover:scale-125 active:scale-95' : 'cursor-default'
                                   } ${
-                                    (item.mi_puntuacion && star <= (item.mi_puntuacion as number))
+                                    (item.mi_puntuacion && estrella <= (item.mi_puntuacion as number))
                                     ? 'text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.3)]'
                                     : 'text-stone-300'
                                   }`}
-                                  title={usuario ? `Puntuar con ${star} estrellas` : 'Inicia sesión para puntuar'}
+                                  title={usuario ? `Puntuar con ${estrella} estrellas` : 'Inicia sesión para puntuar'}
                                 >
                                   ★
                                 </button>
@@ -219,6 +255,27 @@ const Carta: React.FC = () => {
         )}
       </div>
 
+      {/* --- Botón Flotante para Volver Arriba --- */}
+      <button
+        onClick={irHaciaArriba}
+        className={`fixed bottom-8 right-8 z-50 p-4 rounded-full bg-[#30312E] text-[#D3CCBC] shadow-2xl transition-all duration-500 transform hover:scale-110 hover:bg-[#4a4b46] active:scale-95 ${
+          mostrarBotonArriba ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'
+        }`}
+        aria-label="Volver arriba"
+      >
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          className="h-6 w-6 md:h-8 md:w-8" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+          strokeWidth={3}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+        </svg>
+      </button>
+
+      {/* Estilos específicos para animaciones */}
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(20px); }
