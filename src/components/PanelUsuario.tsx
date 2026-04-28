@@ -363,7 +363,7 @@ const PanelUsuario: React.FC = () => {
                                         </div>
                                     </div>
                                 ))}
-                                <p className="text-[10px] text-stone-400 italic text-center pt-2">Productos ordenados por tu puntuación personal.</p>
+                                <p className="text-[12px] text-stone-500 italic text-center pt-2">Productos ordenados por tu puntuación personal.</p>
                             </div>
                         )}
                     </div>
