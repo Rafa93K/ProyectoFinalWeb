@@ -10,12 +10,26 @@ interface Reserva {
     mensaje: string;
 }
 
+interface ProductoVotado {
+    id_producto: number;
+    nombre: string;
+    imagen: string;
+    mi_puntuacion: number;
+    media_votos: string;
+    tipo: string;
+    subtipo: string;
+}
+
 const PanelUsuario: React.FC = () => {
     const [reservas, setReservas] = useState<Reserva[]>([]);
     const [cargando, setCargando] = useState(true);
     const [usuario, setUsuario] = useState<{ nombre: string, telefono: string } | null>(null);
     const [idAEliminar, setIdAEliminar] = useState<number | null>(null);
     const [confirmando, setConfirmando] = useState(false);
+
+    // Estados para PRODUCTOS VOTADOS
+    const [votos, setVotos] = useState<ProductoVotado[]>([]);
+    const [cargandoVotos, setCargandoVotos] = useState(false);
 
     // Estados para la MODIFICACIÓN
     const [reservaEditando, setReservaEditando] = useState<Reserva | null>(null);
@@ -41,6 +55,7 @@ const PanelUsuario: React.FC = () => {
             const parsed = JSON.parse(sesionRaw);
             setUsuario(parsed);
             obtenerReservas(parsed.telefono);
+            obtenerVotos(parsed.id_usuario);
         } catch (e) {
             localStorage.removeItem('usuarioSesion');
             navegar('/login');
@@ -102,6 +117,39 @@ const PanelUsuario: React.FC = () => {
         } finally {
             setCargando(false);
         }
+    };
+
+    const obtenerVotos = async (idUsuario: number) => {
+        setCargandoVotos(true);
+        try {
+            // Usamos getProductos.php que ya devuelve 'mi_puntuacion' si pasamos el id_usuario
+            const response = await fetch(`https://rafa.cicloflorenciopintado.es/getProductos.php?tipo=all&id_usuario=${idUsuario}`);
+            const data = await response.json();
+            if (Array.isArray(data)) {
+                // Filtramos solo los que el usuario ha votado
+                const filtrados = data.filter((p: any) => p.mi_puntuacion !== null);
+                // Ordenamos por puntuación del usuario descendente
+                filtrados.sort((a, b) => (b.mi_puntuacion || 0) - (a.mi_puntuacion || 0));
+                setVotos(filtrados);
+            }
+        } catch (error) {
+            console.error('Error al obtener votos:', error);
+        } finally {
+            setCargandoVotos(false);
+        }
+    };
+
+    const getImagePath = (imagen: string) => {
+        let nombreArchivo = imagen;
+        if (!nombreArchivo || nombreArchivo === '') {
+            nombreArchivo = 'default.jpg';
+        } else {
+            if (nombreArchivo.startsWith('http') || nombreArchivo.startsWith('data:')) return nombreArchivo;
+            if (nombreArchivo.startsWith('/')) nombreArchivo = nombreArchivo.substring(1);
+            if (nombreArchivo.startsWith('Img/')) nombreArchivo = nombreArchivo.substring(4);
+            if (nombreArchivo.startsWith('img/')) nombreArchivo = nombreArchivo.substring(4);
+        }
+        return `https://rafa.cicloflorenciopintado.es/Img/${nombreArchivo}`;
     };
 
     const eliminarReserva = (id: number) => {
@@ -189,79 +237,137 @@ const PanelUsuario: React.FC = () => {
 
     return (
         <div className="flex-1 bg-[#D3CCBC] p-3 md:p-12">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-5xl mx-auto">
                 <header className="mb-10 text-center">
-                    <h1 className="text-2xl md:text-4xl font-bold text-stone-800 mb-2 font-serif">Mis Reservas</h1>
-                    <p className="text-sm text-stone-500">Hola, <span className="font-bold text-[#30312E]">{usuario?.nombre}</span>. Aquí puedes gestionar tus próximas visitas.</p>
+                    <h1 className="text-2xl md:text-4xl font-bold text-stone-800 mb-2 font-serif">Mi Panel Personal</h1>
+                    <p className="text-sm text-stone-500">Hola, <span className="font-bold text-[#30312E]">{usuario?.nombre}</span>. Aquí puedes gestionar tus reservas y ver tus platos favoritos.</p>
                 </header>
+                <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 items-start">
+                    {/* COLUMNA IZQUIERDA: RESERVAS */}
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="bg-[#30312E] p-2 rounded-xl shadow-lg">
+                                <img src="/calendar.svg" alt="" className="w-6 h-6 invert opacity-80" />
+                            </div>
+                            <h2 className="text-xl font-bold text-[#30312E] font-serif uppercase tracking-wider">Mis Reservas</h2>
+                        </div>
 
-                {reservas.length === 0 ? (
-                    <div className="bg-[#e2dbc9] rounded-3xl p-8 md:p-12 text-center shadow-sm border border-stone-200">
-                        <img src="/calendar.svg" alt="Calendario" className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-6 opacity-80" />
-                        <h3 className="text-lg md:text-xl font-bold text-stone-700 mb-2">No tienes reservas activas</h3>
-                        <p className="text-sm md:text-base text-stone-500 mb-6">¿Te apetece disfrutar de nuestra cocina hoy?</p>
-                        <button
-                            onClick={() => navegar('/reservar')}
-                            className="bg-[#30312E] text-[#D3CCBC] px-6 md:px-8 py-3 rounded-full text-sm md:text-base font-bold hover:bg-[#4a4b46] transition-all"
-                        >
-                            Hacer una Reserva
-                        </button>
-                    </div>
-                ) : (
-                    <div className="grid gap-6">
-                        {reservas.map(reserva => (
-                            <div key={reserva.id_reserva} className="bg-[#E2DBC9] rounded-2xl p-3 md:p-4 shadow-md border border-stone-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-lg transition-shadow overflow-hidden">
-                                <div className="flex-1 w-full flex flex-col gap-3">
-                                    <div className="flex flex-row flex-wrap items-start justify-between md:justify-start gap-3 md:gap-12">
-                                        {/* Elemento 1: PAX */}
-                                        <div className="flex flex-col items-center md:items-start min-w-[60px]">
-                                            <div className="bg-[#D3CCBC] px-2 py-0.5 rounded-lg text-[10px] font-bold text-[#30312E] uppercase mb-1 w-full text-center md:text-left">Personas</div>
-                                            <div className="text-xl md:text-2xl font-bold text-stone-800">{reserva.personas}</div>
-                                        </div>
-                                        
-                                        {/* Elemento 2: Fecha */}
-                                        <div className="flex flex-col items-center md:items-start">
-                                            <div className="bg-[#D3CCBC] px-2 py-0.5 rounded-lg text-[10px] font-bold text-[#30312E] uppercase mb-1 w-full text-center md:text-left">Fecha</div>
-                                            <div className="text-sm md:text-base font-bold text-stone-800">
-                                                {new Date(reserva.fecha).toLocaleDateString()}
+                        {reservas.length === 0 ? (
+                            <div className="bg-[#e2dbc9] rounded-3xl p-8 text-center shadow-sm border border-stone-200">
+                                <h3 className="text-lg font-bold text-stone-700 mb-2">No tienes reservas activas</h3>
+                                <p className="text-sm text-stone-500 mb-6">¿Te apetece disfrutar de nuestra cocina hoy?</p>
+                                <button
+                                    onClick={() => navegar('/reservar')}
+                                    className="bg-[#30312E] text-[#D3CCBC] px-6 py-3 rounded-full text-sm font-bold hover:bg-[#4a4b46] transition-all"
+                                >
+                                    Hacer una Reserva
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="grid gap-4">
+                                {reservas.map(reserva => (
+                                    <div key={reserva.id_reserva} className="bg-[#E2DBC9] rounded-2xl p-4 shadow-md border border-stone-100 flex flex-col justify-between gap-4 hover:shadow-lg transition-all group">
+                                        <div className="flex-1 w-full flex flex-col gap-3">
+                                            <div className="flex flex-row justify-between items-center bg-[#D3CCBC]  p-3 rounded-xl">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] font-black text-[#30312E]/40 uppercase">Fecha</span>
+                                                    <span className="font-bold text-stone-800">{new Date(reserva.fecha).toLocaleDateString()}</span>
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                    <span className="text-[10px] font-black text-[#30312E]/40 uppercase">Hora</span>
+                                                    <span className="font-bold text-stone-800">{reserva.hora.substring(0, 5)}</span>
+                                                </div>
+                                                <div className="flex flex-col items-end">
+                                                    <span className="text-[10px] font-black text-[#30312E]/40 uppercase">Pax</span>
+                                                    <span className="font-bold text-stone-800">{reserva.personas} pers.</span>
+                                                </div>
                                             </div>
+
+                                            {reserva.mensaje && (
+                                                <div className="px-1">
+                                                    <p className="text-xs text-stone-500 italic leading-relaxed">"{reserva.mensaje}"</p>
+                                                </div>
+                                            )}
                                         </div>
 
-                                        {/* Elemento 3: Hora */}
-                                        <div className="flex flex-col items-center md:items-start">
-                                            <div className="bg-[#D3CCBC] px-2 py-0.5 rounded-lg text-[10px] font-bold text-[#30312E] uppercase mb-1 w-full text-center md:text-left">Hora</div>
-                                            <div className="text-sm md:text-base font-bold text-stone-800">
-                                               {reserva.hora.substring(0, 5)}
-                                            </div>
+                                        <div className="flex gap-2 pt-2 border-t border-stone-800/5">
+                                            <button
+                                                className="flex-1 px-4 py-2 rounded-xl text-[#30312E] text-xs font-bold hover:bg-white/50 transition-colors border border-[#30312E]/10 flex items-center justify-center gap-2"
+                                                onClick={() => abrirModificacion(reserva)}
+                                            >
+                                                ✏️ Modificar
+                                            </button>
+                                            <button
+                                                onClick={() => eliminarReserva(reserva.id_reserva)}
+                                                className="flex-1 px-4 py-2 rounded-xl text-red-800 text-xs font-bold hover:bg-red-50 transition-colors border border-red-100 flex items-center justify-center gap-2"
+                                                title="Cancelar Reserva"
+                                            >
+                                                🗑️ Cancelar
+                                            </button>
                                         </div>
                                     </div>
-
-                                    {reserva.mensaje && (
-                                        <div className="mt-1">
-                                            <div className="bg-[#D3CCBC] px-2 py-0.5 rounded-lg text-[10px] font-bold text-[#30312E] uppercase mb-1 inline-block">Observaciones</div>
-                                            <p className="text-xs md:text-sm text-stone-600 italic ml-1 leading-relaxed break-words">"{reserva.mensaje}"</p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="flex gap-2 w-full md:w-auto border-t md:border-t-0 md:border-l border-stone-800/10 pt-4 md:pt-0 md:pl-6">
-                                    <button
-                                        className="flex-1 md:flex-initial px-4 py-2.5 rounded-xl text-[#30312E] text-xs md:text-sm font-bold hover:bg-[#D3CCBC]/50 transition-colors border border-[#30312E]/10"
-                                        onClick={() => abrirModificacion(reserva)}
-                                    >
-                                        ✏️ Modificar
-                                    </button>
-                                    <button
-                                        onClick={() => eliminarReserva(reserva.id_reserva)}
-                                        className="flex-1 md:flex-initial px-4 py-2.5 rounded-xl text-red-800 text-xs md:text-sm font-bold hover:bg-red-50 transition-colors border border-red-100"
-                                    >
-                                        🗑️ Cancelar
-                                    </button>
-                                </div>
+                                ))}
                             </div>
-                        ))}
+                        )}
                     </div>
-                )}
+
+                    {/* COLUMNA DERECHA: RANKING DE VOTOS */}
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="bg-[#30312E] p-2 rounded-xl shadow-lg">
+                                <span className="text-xl">⭐</span>
+                            </div>
+                            <h2 className="text-xl font-bold text-[#30312E] font-serif uppercase tracking-wider">Mi Ranking</h2>
+                        </div>
+
+                        {cargandoVotos ? (
+                            <div className="text-center py-10 italic text-stone-400 animate-pulse">Cargando tus votos...</div>
+                        ) : votos.length === 0 ? (
+                            <div className="bg-[#e2dbc9]/60 rounded-3xl p-8 text-center border-2 border-dashed border-[#30312E]/10">
+                                <p className="text-stone-500 text-sm italic mb-4">Aún no has votado ningún producto.</p>
+                                <button
+                                    onClick={() => navegar('/carta')}
+                                    className="text-[#30312E] font-bold text-sm underline hover:opacity-70"
+                                >
+                                    Ir a la Carta
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="grid gap-4">
+                                {votos.map((voto, index) => (
+                                    <div key={voto.id_producto} className="bg-[#E2DBC9] rounded-xl p-2 shadow-sm border border-stone-100 flex items-center gap-3 group hover:shadow-md transition-all">
+                                        <div className="relative w-12 h-12 shrink-0">
+                                            <img 
+                                                src={getImagePath(voto.imagen)} 
+                                                alt={voto.nombre} 
+                                                className="w-full h-full object-cover rounded-lg shadow-sm group-hover:scale-105 transition-transform" 
+                                            />
+                                            <div className="absolute -top-1 -left-1 bg-[#30312E] text-[#D3CCBC] w-5 h-5 rounded-md flex items-center justify-center text-[8px] font-black shadow-lg">
+                                                #{index + 1}
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="font-bold text-[#30312E] text-xs truncate">{voto.nombre}</h4>
+                                            <div className="flex items-center gap-2 mt-0.5">
+                                                <div className="flex text-yellow-600 text-[10px]">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <span key={i}>{i < voto.mi_puntuacion ? '★' : '☆'}</span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-white/40 px-2 py-1 rounded-lg text-center min-w-[35px]">
+                                            <span className="text-sm font-black text-[#30312E] leading-none">{voto.mi_puntuacion}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                                <p className="text-[10px] text-stone-400 italic text-center pt-2">Productos ordenados por tu puntuación personal.</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* Modal de Modificación */}
@@ -391,7 +497,7 @@ const PanelUsuario: React.FC = () => {
                 .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
                 .animate-popIn { animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
             `}</style>
-        </div>
+            </div>
     );
 };
 

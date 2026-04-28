@@ -13,6 +13,8 @@ interface Producto {
   tipo: string;
   subtipo: string;
   imagen: string;
+  total_votos?: number | string;
+  media_votos?: number | string;
 }
 
 const PanelAdmin: React.FC = () => {
@@ -28,7 +30,7 @@ const PanelAdmin: React.FC = () => {
   const [filtroActivo, setFiltroActivo] = useState('todos');
   
   // Estados para Reservas
-  const [vistaActual, setVistaActual] = useState<'productos' | 'reservas'>('productos');
+  const [vistaActual, setVistaActual] = useState<'productos' | 'reservas' | 'puntuaciones'>('productos');
   const [listaReservas, setListaReservas] = useState<any[]>([]);
   const [filtroFecha, setFiltroFecha] = useState(new Date().toISOString().split('T')[0]);
   const [cargandoReservas, setCargandoReservas] = useState(false);
@@ -53,6 +55,10 @@ const PanelAdmin: React.FC = () => {
   });
   const [archivoImagen, setArchivoImagen] = useState<File | null>(null);
 
+  // Estados para Modal de Confirmación de Eliminación
+  const [confirmarEliminar, setConfirmarEliminar] = useState<{ id: number, tipo: 'producto' | 'reserva' } | null>(null);
+  const [ejecutandoEliminacion, setEjecutandoEliminacion] = useState(false);
+
   const subtiposPorTipo: Record<string, string[]> = {
     carta: ['entrantes', 'carnes', 'pescados','pastas', 'postres'],
     vinos: ['tintos', 'blancos', 'rosados', 'espumosos'],
@@ -73,22 +79,32 @@ const PanelAdmin: React.FC = () => {
     }
   };
 
-  const eliminarReserva = async (id: number) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar esta reserva?')) {
-      try {
-        const formData = new FormData();
-        formData.append('id_reserva', id.toString());
-        const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/eliminarReserva.php', {
-          method: 'POST',
-          body: formData
-        });
-        const resultado = await respuesta.json();
-        if (resultado.success) {
-          obtenerReservas(filtroFecha);
-        }
-      } catch (error) {
-        console.error('Error al eliminar reserva');
+  const eliminarReserva = (id: number) => {
+    setConfirmarEliminar({ id, tipo: 'reserva' });
+  };
+
+  const confirmarEliminacionReserva = async (id: number) => {
+    setEjecutandoEliminacion(true);
+    try {
+      const formData = new FormData();
+      formData.append('id_reserva', id.toString());
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/eliminarReserva.php', {
+        method: 'POST',
+        body: formData
+      });
+      const resultado = await respuesta.json();
+      if (resultado.success) {
+        obtenerReservas(filtroFecha);
+        showNotification('Reserva eliminada con éxito', 'success');
+      } else {
+        showNotification(resultado.message || 'Error al eliminar reserva', 'error');
       }
+    } catch (error) {
+      console.error('Error al eliminar reserva');
+      showNotification('Error de conexión', 'error');
+    } finally {
+      setEjecutandoEliminacion(false);
+      setConfirmarEliminar(null);
     }
   };
 
@@ -143,8 +159,33 @@ const PanelAdmin: React.FC = () => {
   useEffect(() => {
     if (vistaActual === 'reservas') {
       obtenerReservas(filtroFecha);
+    } else if (vistaActual === 'puntuaciones') {
+      obtenerPuntuaciones();
+    } else if (vistaActual === 'productos') {
+      obtenerProductos();
     }
   }, [filtroFecha, vistaActual]);
+
+  const obtenerPuntuaciones = async () => {
+    setCargando(true);
+    try {
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/getProductos.php?tipo=all');
+      const datos = await respuesta.json();
+      if (Array.isArray(datos)) {
+        // Ordenar por media de votos descendente. Manejar nulos como 0.
+        const ordenados = [...datos].sort((a, b) => {
+          const mediaA = parseFloat(a.media_votos) || 0;
+          const mediaB = parseFloat(b.media_votos) || 0;
+          return mediaB - mediaA;
+        });
+        setListaProductos(ordenados); // Reutilizamos listaProductos o podríamos usar otro estado
+      }
+    } catch (error) {
+      console.error('Error al cargar puntuaciones:', error);
+    } finally {
+      setCargando(false);
+    }
+  };
 
   // --- LÓGICA DE PRODUCTOS ---
   const getImagePath = (imagen: string) => {
@@ -219,22 +260,32 @@ const PanelAdmin: React.FC = () => {
     }
   };
 
-  const eliminarProducto = async (id: number) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-      try {
-        const formData = new FormData();
-        formData.append('id_producto', id.toString());
-        const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/eliminarProducto.php', {
-          method: 'POST',
-          body: formData
-        });
-        const resultado = await respuesta.json();
-        if (resultado.success) {
-          setListaProductos(listaProductos.filter(p => p.id_producto !== id));
-        }
-      } catch (error) {
-        console.error('Error al eliminar');
+  const eliminarProducto = (id: number) => {
+    setConfirmarEliminar({ id, tipo: 'producto' });
+  };
+
+  const confirmarEliminacionProducto = async (id: number) => {
+    setEjecutandoEliminacion(true);
+    try {
+      const formData = new FormData();
+      formData.append('id_producto', id.toString());
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/eliminarProducto.php', {
+        method: 'POST',
+        body: formData
+      });
+      const resultado = await respuesta.json();
+      if (resultado.success) {
+        setListaProductos(listaProductos.filter(p => p.id_producto !== id));
+        showNotification('Producto eliminado', 'success');
+      } else {
+        showNotification(resultado.message || 'Error al eliminar producto', 'error');
       }
+    } catch (error) {
+      console.error('Error al eliminar');
+      showNotification('Error de conexión', 'error');
+    } finally {
+      setEjecutandoEliminacion(false);
+      setConfirmarEliminar(null);
     }
   };
 
@@ -362,6 +413,12 @@ const PanelAdmin: React.FC = () => {
           >
             Reservas
           </button>
+          <button 
+            onClick={() => setVistaActual('puntuaciones')}
+            className={`px-6 py-2 rounded-xl font-bold transition-all ${vistaActual === 'puntuaciones' ? 'bg-[#30312E] text-[#D3CCBC]' : 'text-[#30312E]/60 hover:bg-white/40'}`}
+          >
+            Puntuación
+          </button>
         </div>
 
         {/* CONTENIDO DINÁMICO */}
@@ -408,7 +465,7 @@ const PanelAdmin: React.FC = () => {
               </div>
             )}
           </>
-        ) : (
+        ) : vistaActual === 'reservas' ? (
           /* VISTA DE RESERVAS */
           <div className="space-y-8 animate-fadeIn">
             <div className="bg-[#E2DBC9] p-6 rounded-3xl shadow-sm border border-white/20 flex flex-col md:flex-row items-center gap-6">
@@ -467,6 +524,55 @@ const PanelAdmin: React.FC = () => {
             ) : (
               <div className="bg-white/10 rounded-[3rem] py-20 text-center border-2 border-dashed border-white/20">
                  <p className="text-2xl text-stone-400 italic font-serif">No hay reservas para este día aún.</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* VISTA DE PUNTUACIONES */
+          <div className="space-y-6 animate-fadeIn">
+            <div className="bg-[#E2DBC9] p-6 rounded-3xl shadow-sm border border-white/20 mb-8">
+              <h2 className="text-xl font-bold text-[#30312E] font-serif">Ranking de Productos por Valoración</h2>
+              <p className="text-stone-500 text-sm italic">Listado ordenado de mayor a menor puntuación media recibida por los clientes.</p>
+            </div>
+
+            {cargando ? (
+              <div className="text-center py-20 italic">Calculando rankings...</div>
+            ) : (
+              <div className="grid gap-4">
+                {listaProductos.map((prod, index) => (
+                  <div key={prod.id_producto} className="bg-[#E2DBC9] p-4 rounded-3xl shadow-md border hover:border-[#30312E]/30 transition-all flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div className="flex items-center gap-6">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg shadow-inner ${
+                        index === 0 ? 'bg-yellow-500 text-white' : 
+                        index === 1 ? 'bg-stone-400 text-white' : 
+                        index === 2 ? 'bg-orange-600 text-white' : 'bg-[#30312E]/10 text-[#30312E]'
+                      }`}>
+                        #{index + 1}
+                      </div>
+                      <div className="w-16 h-16 rounded-xl overflow-hidden border border-[#30312E]/10">
+                         <img src={getImagePath(prod.imagen)} alt={prod.nombre} className="w-full h-full object-cover" />
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-bold text-[#30312E] font-serif">{prod.nombre}</h4>
+                        <span className="text-[10px] uppercase font-black text-stone-400 tracking-widest bg-stone-100 px-2 py-0.5 rounded-full">{prod.tipo} - {prod.subtipo}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-8 pr-4">
+                       <div className="text-center">
+                         <span className="block text-[10px] font-black text-stone-400 uppercase tracking-widest mb-1">Votos</span>
+                         <span className="text-xl font-bold text-[#30312E]">{prod.total_votos || 0}</span>
+                       </div>
+                       <div className="bg-[#30312E] text-[#D3CCBC] px-6 py-3 rounded-2xl flex flex-col items-center justify-center shadow-lg min-w-[100px]">
+                         <span className="text-[10px] font-bold opacity-60 uppercase tracking-tighter">Media</span>
+                         <div className="flex items-center gap-1">
+                            <span className="text-2xl font-black">{prod.media_votos || '0.0'}</span>
+                            <span className="text-yellow-500 text-xl">★</span>
+                         </div>
+                       </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -596,6 +702,63 @@ const PanelAdmin: React.FC = () => {
            </div>
         </div>
       )}
+      {/* MODAL DE CONFIRMACIÓN DE ELIMINACIÓN */}
+      {confirmarEliminar && (
+        <div className="fixed inset-0 bg-[#30312E]/60 backdrop-blur-sm flex items-center justify-center p-4 z-[60] animate-fadeIn">
+          <div className="bg-[#E2DBC9] rounded-3xl p-8 max-w-sm w-full shadow-2xl border border-[#D3CCBC] transform animate-popIn">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                ⚠️
+              </div>
+              <h3 className="text-2xl font-bold text-[#30312E] mb-2 font-serif">
+                ¿Eliminar {confirmarEliminar.tipo === 'producto' ? 'Producto' : 'Reserva'}?
+              </h3>
+              <p className="text-[#30312E]/70 mb-8">
+                Esta acción es irreversible. ¿Estás seguro de que deseas proceder?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setConfirmarEliminar(null)}
+                  className="flex-1 px-6 py-3 rounded-xl font-bold bg-[#D3CCBC] text-[#30312E] hover:bg-[#c5bdab] transition-all"
+                  disabled={ejecutandoEliminacion}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => {
+                    if (confirmarEliminar.tipo === 'producto') {
+                      confirmarEliminacionProducto(confirmarEliminar.id);
+                    } else {
+                      confirmarEliminacionReserva(confirmarEliminar.id);
+                    }
+                  }}
+                  className="flex-1 px-6 py-3 rounded-xl font-bold bg-red-800 text-white hover:bg-red-900 shadow-lg transition-all flex items-center justify-center gap-2"
+                  disabled={ejecutandoEliminacion}
+                >
+                  {ejecutandoEliminacion ? (
+                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                  ) : (
+                    'Eliminar'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes popIn {
+          from { opacity: 0; transform: scale(0.9) translateY(10px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+        .animate-popIn { animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+      `}</style>
     </div>
   );
 };
