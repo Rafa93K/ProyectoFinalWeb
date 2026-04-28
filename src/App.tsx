@@ -83,7 +83,7 @@ function App() {
   const esAdmin = ubicacion.pathname.startsWith('/admin');
 
   return (
-    <div className="min-h-screen bg-[#D3CCBC] flex flex-col font-serif">
+    <div className="min-h-screen bg-[#D3CCBC] flex flex-col font-serif overflow-x-hidden">
       <NotificationManager />
       <Header />
       {/* Mostrar la navegación de login si no estamos en admin */}
