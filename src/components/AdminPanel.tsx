@@ -489,36 +489,40 @@ const PanelAdmin: React.FC = () => {
             ) : listaReservas.length > 0 ? (
               <div className="grid gap-4">
                 {listaReservas.map((res: any) => (
-                  <div key={res.id_reserva} className="bg-[#E2DBC9] p-6 rounded-3xl shadow-md border hover:border-[#30312E]/30 transition-all flex flex-col md:flex-row justify-between items-center gap-4">
-                     <div className="flex items-center gap-6">
-                        <div className="bg-[#30312E] text-[#D3CCBC] w-16 h-16 rounded-2xl flex flex-col items-center justify-center shadow-lg">
+                  <div key={res.id_reserva} className="bg-[#E2DBC9] p-6 rounded-3xl shadow-md border hover:border-[#30312E]/30 transition-all flex flex-col md:flex-row justify-between items-center gap-6">
+                     {/* SECCIÓN IZQUIERDA: Info Cliente */}
+                     <div className="flex items-center gap-6 md:flex-1">
+                        <div className="bg-[#30312E] text-[#D3CCBC] w-16 h-16 rounded-2xl flex flex-col items-center justify-center shadow-lg shrink-0">
                           <span className="text-xs font-bold opacity-60">HORA</span>
                           <span className="text-xl font-black">{res.hora.substring(0, 5)}</span>
                         </div>
                         <div>
-                          <h4 className="text-xl font-bold text-[#30312E] font-serif">{res.nombre_cliente}</h4>
+                          <h4 className="text-xl font-bold text-[#30312E] font-serif leading-tight">{res.nombre_cliente}</h4>
                           <p className="text-stone-500 font-medium">📞 {res.telefono}</p>
                         </div>
                      </div>
                      
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-8">
-                           <div className="text-center">
-                             <span className="block text-[10px] font-black text-stone-400 uppercase tracking-widest">Comensales</span>
-                             <span className="text-2xl font-bold text-[#30312E]">{res.personas} pers.</span>
-                           </div>
-                           {res.mensaje && (
-                             <div className="max-w-[200px] text-xs italic text-stone-500 bg-white/30 p-3 rounded-xl">
-                               "{res.mensaje}"
-                             </div>
-                           )}
+                     {/* SECCIÓN CENTRAL: Mensaje de Observaciones (Centrado) */}
+                     <div className="flex-1 flex justify-center">
+                        {res.mensaje && (
+                          <div className="text-center italic text-stone-500 bg-white/30 p-3 rounded-xl max-w-xs md:max-w-md">
+                            "{res.mensaje}"
+                          </div>
+                        )}
+                     </div>
+                     
+                     {/* SECCIÓN DERECHA: Comensales y Botones */}
+                     <div className="flex items-center gap-8 md:flex-1 md:justify-end">
+                        <div className="text-center shrink-0">
+                          <span className="block text-[10px] font-black text-stone-400 uppercase tracking-widest">Comensales</span>
+                          <span className="text-2xl font-bold text-[#30312E]">{res.personas} pers.</span>
                         </div>
                         
                         <div className="flex gap-2">
                            <button onClick={() => abrirModalReserva(res)} className="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-sm hover:bg-[#30312E] hover:text-[#D3CCBC] transition-all border border-[#30312E]/10">✏️</button>
                            <button onClick={() => eliminarReserva(res.id_reserva)} className="w-10 h-10 bg-red-100/90 text-red-600 rounded-full flex items-center justify-center shadow-sm hover:bg-red-600 hover:text-white transition-all border border-red-200">🗑️</button>
                         </div>
-                      </div>
+                     </div>
                   </div>
                 ))}
               </div>
