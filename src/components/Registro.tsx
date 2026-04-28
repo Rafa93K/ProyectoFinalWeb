@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { showNotification } from './Notification';
 
 const Registro: React.FC = () => {
     // Estado para el formulario de registro
@@ -17,12 +18,12 @@ const Registro: React.FC = () => {
         e.preventDefault();
 
         if (datos.password !== datos.confirmPassword) {
-            alert('Las contraseñas no coinciden');
+            showNotification('Las contraseñas no coinciden', 'error');
             return;
         }
 
-        if (datos.telefono.length < 9) {
-            alert('El número de teléfono debe tener al menos 9 dígitos');
+        if (datos.telefono.length !== 9) {
+            showNotification('El número de teléfono debe tener exactamente 9 dígitos', 'error');
             return;
         }
 
@@ -41,7 +42,7 @@ const Registro: React.FC = () => {
             const result = await response.json();
 
             if (result.success) {
-                alert(result.message);
+                showNotification(result.message, 'success');
                 // Guardamos el objeto usuario en localStorage para iniciar sesión automáticamente
                 const usuarioData = {
                     id_usuario: result.id_usuario,
@@ -51,11 +52,11 @@ const Registro: React.FC = () => {
                 localStorage.setItem('usuarioSesion', JSON.stringify(usuarioData));
                 window.location.href = '/home';
             } else {
-                alert(result.message);
+                showNotification(result.message, 'error');
             }
         } catch (error) {
             console.error('Error en el registro:', error);
-            alert('Hubo un error al procesar el registro');
+            showNotification('Hubo un error al procesar el registro', 'error');
         }
     };
 
@@ -88,6 +89,7 @@ const Registro: React.FC = () => {
                             type="tel"
                             required
                             minLength={9}
+                            maxLength={9}
                             placeholder="600 000 000"
                             className="w-full px-4 py-3 rounded-xl border border-stone-100 focus:ring-2 focus:ring-[#30312E] outline-none transition-all bg-[#D4CDBC]"
                             value={datos.telefono}

@@ -23,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    if (strlen($telefono) < 9) {
-        echo json_encode(["success" => false, "message" => "El número de teléfono debe tener al menos 9 dígitos"]);
+    if (strlen($telefono) !== 9) {
+        echo json_encode(["success" => false, "message" => "El número de teléfono debe tener exactamente 9 dígitos"]);
         exit;
     }
 

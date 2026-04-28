@@ -13,6 +13,7 @@ import Registro from './components/Registro';
 import Login from './components/Login';
 import PanelUsuario from './components/PanelUsuario';
 import { Reservar } from './components/Reservar';
+import { NotificationManager } from './components/Notification';
 
 /**
  * Componente de la Página de Inicio (Home)
@@ -83,6 +84,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#D3CCBC] flex flex-col font-serif">
+      <NotificationManager />
       <Header />
       {/* Mostrar la navegación de login si no estamos en admin */}
       {!esAdmin && <LoginNav />}

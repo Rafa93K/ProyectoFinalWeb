@@ -11,6 +11,8 @@ require_once 'conexion.php';
 
 // Obtener datos del POST
 $id_reserva = isset($_POST['id_reserva']) ? $_POST['id_reserva'] : null;
+$nombre = isset($_POST['nombre_cliente']) ? $_POST['nombre_cliente'] : null;
+$telefono = isset($_POST['telefono']) ? $_POST['telefono'] : null;
 $fecha = isset($_POST['fecha']) ? $_POST['fecha'] : null;
 $hora = isset($_POST['hora']) ? $_POST['hora'] : null;
 $personas = isset($_POST['personas']) ? intval($_POST['personas']) : null;
@@ -18,6 +20,11 @@ $mensaje = isset($_POST['mensaje']) ? $_POST['mensaje'] : '';
 
 if (!$id_reserva || !$fecha || !$hora || !$personas) {
     echo json_encode(["success" => false, "message" => "Datos incompletos para actualizar."]);
+    exit;
+}
+
+if ($telefono && strlen($telefono) !== 9) {
+    echo json_encode(["success" => false, "message" => "El número de teléfono debe tener exactamente 9 dígitos."]);
     exit;
 }
 
@@ -77,11 +84,13 @@ try {
 
     // 3. Ejecutar actualización
     $sql = "UPDATE Reserva 
-            SET fecha = :fecha, hora = :hora, personas = :personas, mensaje = :mensaje 
+            SET nombre_cliente = :nombre, telefono = :tel, fecha = :fecha, hora = :hora, personas = :personas, mensaje = :mensaje 
             WHERE id_reserva = :id";
     
     $stmt = $pdo->prepare($sql);
     $resultado = $stmt->execute([
+        'nombre' => $nombre,
+        'tel' => $telefono,
         'fecha' => $fecha,
         'hora' => $hora,
         'personas' => $personas,

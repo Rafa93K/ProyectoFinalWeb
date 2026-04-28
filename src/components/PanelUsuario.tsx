@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { showNotification } from './Notification';
 
 interface Reserva {
     id_reserva: number;
@@ -123,9 +124,9 @@ const PanelUsuario: React.FC = () => {
             const result = await response.json();
             if (result.success) {
                 setReservas(reservas.filter(r => r.id_reserva !== idAEliminar));
-                // Opcional: podrías poner una notificación bonita aquí en lugar de alert
+                showNotification('Reserva cancelada correctamente', 'success');
             } else {
-                alert(result.message || 'Error al eliminar');
+                showNotification(result.message || 'Error al eliminar', 'error');
             }
         } catch (error) {
             console.error('Error al eliminar reserva:', error);
@@ -165,14 +166,14 @@ const PanelUsuario: React.FC = () => {
 
             const result = await response.json();
             if (result.success) {
-                alert('Reserva actualizada correctamente');
+                showNotification('Reserva actualizada correctamente', 'success');
                 setReservaEditando(null);
                 if (usuario) obtenerReservas(usuario.telefono); // Recargar lista
             } else {
-                alert(result.message || 'Error al actualizar');
+                showNotification(result.message || 'Error al actualizar', 'error');
             }
         } catch (error) {
-            alert('Error de conexión al actualizar');
+            showNotification('Error de conexión al actualizar', 'error');
         } finally {
             setGuardandoModificacion(false);
         }

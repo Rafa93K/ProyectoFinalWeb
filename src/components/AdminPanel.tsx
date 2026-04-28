@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { showNotification } from './Notification';
 
 /**
  * Interfaz que define la estructura de un Producto
@@ -107,6 +108,11 @@ const PanelAdmin: React.FC = () => {
   const guardarCambiosReserva = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (datosReservaForm.telefono.length !== 9) {
+        showNotification('El número de teléfono debe tener exactamente 9 dígitos', 'error');
+        return;
+      }
+
       const formData = new FormData();
       formData.append('id_reserva', reservaEditando.id_reserva.toString());
       formData.append('nombre_cliente', datosReservaForm.nombre_cliente);
@@ -125,8 +131,9 @@ const PanelAdmin: React.FC = () => {
       if (resultado.success) {
         setModalReservaAbierto(false);
         obtenerReservas(filtroFecha);
+        showNotification('Reserva actualizada', 'success');
       } else {
-        alert(resultado.message);
+        showNotification(resultado.message, 'error');
       }
     } catch (error) {
       console.error('Error al guardar reserva');
@@ -262,8 +269,9 @@ const PanelAdmin: React.FC = () => {
     if (resultado.success) {
       setModalAbierto(false);
       obtenerProductos();
+      showNotification('Producto guardado', 'success');
     } else {
-      alert(resultado.message);
+      showNotification(resultado.message, 'error');
     }
   } catch (error) {
     console.error('Error al guardar:', error);
@@ -556,7 +564,7 @@ const PanelAdmin: React.FC = () => {
                    </div>
                    <div>
                      <label className="block text-[10px] font-black text-stone-400 uppercase tracking-widest mb-1 ml-1">Teléfono</label>
-                     <input type="text" className="w-full p-3 rounded-2xl bg-[#D3CCBC] font-bold border-none outline-none focus:ring-2 focus:ring-[#30312E]/20" value={datosReservaForm.telefono} onChange={e => setDatosReservaForm({...datosReservaForm, telefono: e.target.value})} required />
+                     <input type="text" minLength={9} maxLength={9} className="w-full p-3 rounded-2xl bg-[#D3CCBC] font-bold border-none outline-none focus:ring-2 focus:ring-[#30312E]/20" value={datosReservaForm.telefono} onChange={e => setDatosReservaForm({...datosReservaForm, telefono: e.target.value})} required />
                    </div>
                  </div>
 

@@ -75,8 +75,8 @@ const Carta: React.FC = () => {
   };
 
   // Obtiene la lista de productos según el tipo seleccionado
-  const obtenerProductos = async (tipo: string, userId?: string | null) => {
-    setCargando(true);
+  const obtenerProductos = async (tipo: string, userId?: string | null, mostrarCarga: boolean = true) => {
+    if (mostrarCarga) setCargando(true);
     try {
       const id_u = userId || usuario?.id_usuario || '';
       const url = `https://rafa.cicloflorenciopintado.es/getProductos.php?tipo=${tipo}${id_u ? `&id_usuario=${id_u}` : ''}`;
@@ -87,7 +87,7 @@ const Carta: React.FC = () => {
       console.error('Error al obtener productos:', error);
       setProductos([]);
     } finally {
-      setCargando(false);
+      if (mostrarCarga) setCargando(false);
     }
   };
 
@@ -117,8 +117,8 @@ const Carta: React.FC = () => {
       const datos = await respuesta.json();
       
       if (datos.success) {
-        // Recargar productos para actualizar las medias de votos
-        obtenerProductos(pestanaActiva);
+        // Recargar productos silenciosamente para actualizar las medias de votos
+        obtenerProductos(pestanaActiva, null, false);
       }
     } catch (error) {
       console.error('Error al votar:', error);

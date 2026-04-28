@@ -69,7 +69,7 @@ const AdminLogin: React.FC = () => {
     };
 
     return (
-        <div className="min-h-[80vh] flex items-center justify-center p-6 bg-stone-100 relative overflow-hidden">
+        <div className="min-h-[80vh] flex items-center justify-center p-6 bg-[#E2DBC9] relative overflow-hidden">
             {/* Elementos decorativos de fondo */}
             <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-[#30312E]/5 rounded-full blur-3xl" />
             <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-[#D3CCBC]/20 rounded-full blur-3xl" />

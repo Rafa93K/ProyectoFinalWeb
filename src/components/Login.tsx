@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { showNotification } from './Notification';
 
 const Login: React.FC = () => {
     const [telefono, setTelefono] = useState('');
@@ -36,11 +37,11 @@ const Login: React.FC = () => {
                 navegar('/home'); // Redirigir al inicio
                 window.location.reload(); // Recargar para actualizar el Nav
             } else {
-                alert(result.message || 'Error al iniciar sesión');
+                showNotification(result.message || 'Error al iniciar sesión', 'error');
             }
         } catch (error) {
             console.error('Error en el login:', error);
-            alert('Hubo un error al conectar con el servidor');
+            showNotification('Hubo un error al conectar con el servidor', 'error');
         }
     };
 
@@ -58,7 +59,9 @@ const Login: React.FC = () => {
                         <input
                             type="text"
                             required
-                            placeholder="600 000 000"
+                            minLength={9}
+                            maxLength={9}
+                            placeholder="600000000"
                             className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[#30312E] outline-none transition-all bg-[#D4CDBC]"
                             value={telefono}
                             onChange={(e) => setTelefono(e.target.value)}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { showNotification } from './Notification';
 /**
  * Componente Reservar: Gestiona el formulario de reservas del restaurante.
  * Permite a los usuarios elegir fecha, hora (validada dinámicamente) y número de comensales.
@@ -92,6 +93,12 @@ export const Reservar: React.FC = () => {
 
     const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
+
+        if (formData.telefono.length !== 9) {
+            showNotification('El número de teléfono debe tener exactamente 9 dígitos', 'error');
+            return;
+        }
+
         setEnviando(true);
 
         try {
@@ -125,13 +132,14 @@ export const Reservar: React.FC = () => {
             const result = await response.json();
             if (result.success) {
                 setCompletado(true);
+                showNotification('Reserva confirmada correctamente', 'success');
                 // Redirigir tras un breve retraso
                 setTimeout(() => navigate('/mis-reservas'), 3000);
             } else {
-                alert(result.message || 'Hubo un error al procesar tu reserva. Inténtalo de nuevo.');
+                showNotification(result.message || 'Hubo un error al procesar tu reserva. Inténtalo de nuevo.', 'error');
             }
         } catch (error) {
-            alert('No se pudo conectar con el servidor.');
+            showNotification('No se pudo conectar con el servidor.', 'error');
         } finally {
             setEnviando(false);
         }
@@ -182,10 +190,12 @@ export const Reservar: React.FC = () => {
                                     required
                                     type="tel" 
                                     name="telefono"
+                                    minLength={9}
+                                    maxLength={9}
                                     value={formData.telefono}
                                     onChange={handleChange}
                                     className="w-full px-5 py-4 rounded-2xl border border-stone-100 focus:border-[#30312E] focus:ring-2 focus:ring-[#30312E]/10 outline-none transition-all bg-[#d4cdbc] text-stone-800"
-                                    placeholder="600 000 000"
+                                    placeholder="600000000"
                                 />
                             </div>
 

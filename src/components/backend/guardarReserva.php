@@ -33,6 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         exit;
     }
 
+    if (strlen($telefono) !== 9) {
+        echo json_encode(["success" => false, "message" => "El número de teléfono debe tener exactamente 9 dígitos."]);
+        exit;
+    }
+
     // 4. Lógica de Horarios y Turnos (Sincronizada con React)
     $capacidadMaxima = 50;
     $diaSemana = date('N', strtotime($fecha)); // 1 (Lu) a 7 (Dom)
