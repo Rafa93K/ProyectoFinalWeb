@@ -16,15 +16,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $personas = (int)($_POST['personas'] ?? 0);
     $mensaje = $_POST['mensaje'] ?? '';
 
-    // 2. Manejo de Sesión y IDs Opcionales
-    $id_usuario = null;
-    $id_admin = null;
+    // 2. Manejo de IDs y Sesión
+    $id_usuario = $_POST['id_usuario'] ?? null;
+    $id_admin = $_POST['id_admin'] ?? null;
 
     if (isset($_SESSION['usuarioFogon'])) {
-        // Si hay sesión, usamos esos datos y guardamos el ID
-        $nombre = $_SESSION['usuarioFogon']['nombre'];
-        $telefono = $_SESSION['usuarioFogon']['telefono'];
-        $id_usuario = $_SESSION['usuarioFogon']['id'] ?? null;
+        // Si hay sesión y los campos de POST están vacíos, usamos los de sesión
+        if (empty($nombre)) $nombre = $_SESSION['usuarioFogon']['nombre'] ?? '';
+        if (empty($telefono)) $telefono = $_SESSION['usuarioFogon']['telefono'] ?? '';
+        if (!$id_usuario) $id_usuario = $_SESSION['usuarioFogon']['id'] ?? null;
     }
 
     // 3. Validaciones de campos obligatorios

@@ -202,6 +202,8 @@ const PanelUsuario: React.FC = () => {
         try {
             const data = new FormData();
             data.append('id_reserva', reservaEditando.id_reserva.toString());
+            data.append('nombre_cliente', usuario?.nombre || '');
+            data.append('telefono', usuario?.telefono || '');
             data.append('fecha', formModificar.fecha);
             data.append('hora', formModificar.hora);
             data.append('personas', formModificar.personas.toString());
@@ -266,43 +268,45 @@ const PanelUsuario: React.FC = () => {
                         ) : (
                             <div className="grid gap-4">
                                 {reservas.map(reserva => (
-                                    <div key={reserva.id_reserva} className="bg-[#E2DBC9] rounded-2xl p-4 shadow-md border border-stone-100 flex flex-col justify-between gap-4 hover:shadow-lg transition-all group">
-                                        <div className="flex-1 w-full flex flex-col gap-3">
-                                            <div className="flex flex-row justify-between items-center bg-[#D3CCBC]  p-3 rounded-xl">
-                                                <div className="flex flex-col">
-                                                    <span className="text-[10px] font-black text-[#30312E]/40 uppercase">Fecha</span>
-                                                    <span className="font-bold text-stone-800">{new Date(reserva.fecha).toLocaleDateString()}</span>
+                                    <div key={reserva.id_reserva} className="bg-[#E2DBC9] rounded-2xl p-4 md:p-5 shadow-md border border-stone-100 flex flex-col justify-between gap-4 hover:shadow-lg transition-all group overflow-hidden">
+                                        <div className="flex-1 w-full flex flex-col gap-4">
+                                            {/* BARRA DE INFO RESPONSIVA */}
+                                            <div className="flex flex-row justify-between items-center bg-[#D3CCBC] p-3 md:p-4 rounded-xl gap-2">
+                                                <div className="flex flex-col shrink-0">
+                                                    <span className="text-[9px] md:text-[10px] font-black text-[#30312E]/40 uppercase tracking-tighter md:tracking-widest">Fecha</span>
+                                                    <span className="font-bold text-stone-800 text-[13px] md:text-base">{new Date(reserva.fecha).toLocaleDateString()}</span>
                                                 </div>
-                                                <div className="flex flex-col items-center">
-                                                    <span className="text-[10px] font-black text-[#30312E]/40 uppercase">Hora</span>
-                                                    <span className="font-bold text-stone-800">{reserva.hora.substring(0, 5)}</span>
+                                                <div className="flex flex-col items-center shrink-0">
+                                                    <span className="text-[9px] md:text-[10px] font-black text-[#30312E]/40 uppercase tracking-tighter md:tracking-widest">Hora</span>
+                                                    <span className="font-bold text-stone-800 text-[13px] md:text-base">{reserva.hora.substring(0, 5)}</span>
                                                 </div>
-                                                <div className="flex flex-col items-end">
-                                                    <span className="text-[10px] font-black text-[#30312E]/40 uppercase">Pax</span>
-                                                    <span className="font-bold text-stone-800">{reserva.personas} pers.</span>
+                                                <div className="flex flex-col items-end shrink-0">
+                                                    <span className="text-[9px] md:text-[10px] font-black text-[#30312E]/40 uppercase tracking-tighter md:tracking-widest">Pax</span>
+                                                    <span className="font-bold text-stone-800 text-[13px] md:text-base">{reserva.personas} pers.</span>
                                                 </div>
                                             </div>
 
                                             {reserva.mensaje && (
                                                 <div className="px-1">
-                                                    <p className="text-xs text-stone-500 italic leading-relaxed">"{reserva.mensaje}"</p>
+                                                    <p className="text-xs text-stone-500 italic leading-relaxed line-clamp-3">"{reserva.mensaje}"</p>
                                                 </div>
                                             )}
                                         </div>
 
-                                        <div className="flex gap-2 pt-2 border-t border-stone-800/5">
+                                        {/* BOTONES ACCIÓN RESPONSIVOS */}
+                                        <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-stone-800/5">
                                             <button
-                                                className="flex-1 px-4 py-2 rounded-xl text-[#30312E] text-xs font-bold hover:bg-white/50 transition-colors border border-[#30312E]/10 flex items-center justify-center gap-2"
+                                                className="w-full sm:flex-1 px-4 py-2.5 rounded-xl text-[#30312E] text-[11px] font-bold hover:bg-white/50 transition-colors border border-[#30312E]/10 flex items-center justify-center gap-2 shadow-sm"
                                                 onClick={() => abrirModificacion(reserva)}
                                             >
-                                                ✏️ Modificar
+                                                <span>✏️</span> Modificar
                                             </button>
                                             <button
                                                 onClick={() => eliminarReserva(reserva.id_reserva)}
-                                                className="flex-1 px-4 py-2 rounded-xl text-red-800 text-xs font-bold hover:bg-red-50 transition-colors border border-red-100 flex items-center justify-center gap-2"
+                                                className="w-full sm:flex-1 px-4 py-2.5 rounded-xl text-red-800 text-[11px] font-bold hover:bg-red-50 transition-colors border border-red-100 flex items-center justify-center gap-2 shadow-sm"
                                                 title="Cancelar Reserva"
                                             >
-                                                🗑️ Cancelar
+                                                <span>🗑️</span> Cancelar
                                             </button>
                                         </div>
                                     </div>

@@ -18,8 +18,8 @@ $hora = isset($_POST['hora']) ? $_POST['hora'] : null;
 $personas = isset($_POST['personas']) ? intval($_POST['personas']) : null;
 $mensaje = isset($_POST['mensaje']) ? $_POST['mensaje'] : '';
 
-if (!$id_reserva || !$fecha || !$hora || !$personas) {
-    echo json_encode(["success" => false, "message" => "Datos incompletos para actualizar."]);
+if (!$id_reserva || !$nombre || !$telefono || !$fecha || !$hora || !$personas) {
+    echo json_encode(["success" => false, "message" => "Datos incompletos para actualizar (nombre, teléfono, fecha, hora y comensales son obligatorios)."]);
     exit;
 }
 

@@ -358,58 +358,33 @@ const PanelAdmin: React.FC = () => {
     : listaProductos.filter(p => p.tipo === filtroActivo);
 
   return (
-    <div className="flex-1 bg-[#D3CCBC] min-h-screen p-4 md:p-10 font-sans">
-      <div className="max-w-7xl mx-auto">
-        {/* CABECERA */}
-        <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-6 w-full lg:w-auto">
-            <div className="bg-[#30312E] p-6 rounded-3xl shadow-xl w-full">
-              <h1 className="text-3xl font-bold text-[#D3CCBC] font-serif">Panel de Control</h1>
-              <p className="text-[#D3CCBC]/60 text-xs uppercase tracking-widest mt-1">Gestión Administrativa</p>
-            </div>
-            
-            <div className="flex items-center gap-3 bg-[#E2DBC9] px-5 py-3 rounded-2xl border border-[#30312E]/10 shadow-sm">
-              <span className="text-sm font-bold text-[#30312E]">{adminNombre}</span>
-              <button onClick={cerrarSesion} className="ml-2 text-red-800 hover:text-red-900 font-bold text-xs bg-red-50 px-4 py-2 rounded-xl transition-all uppercase">
-                Cerrar Sesión
-              </button>
-            </div>
+    <div className="flex-1 bg-[#D3CCBC] min-h-screen font-sans">
+      {/* SUB-HEADER: INDICADOR DE SECCIÓN (FINO Y PEGADO) */}
+      <div className="bg-[#4A4B46] px-8 py-2 w-full flex justify-between items-center border-b border-white/5 shadow-lg">
+          <div className="flex items-center gap-4">
+            <h2 className="text-sm md:text-lg font-bold text-[#D3CCBC] font-serif">Panel de Control</h2>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
-            {/* TOGGLE ESPECIALES SOLO VISIBLE EN VISTA PRODUCTOS */}
-            {vistaActual === 'productos' && (
-              <div className="flex items-center gap-4 bg-[#E2DBC9] p-4 rounded-3xl shadow-sm border border-[#30312E]/10">
-                <span className="text-sm font-bold text-[#30312E] uppercase">Especiales:</span>
-                <button
-                  onClick={alternarEspeciales}
-                  className={`w-14 h-7 flex items-center rounded-full p-1 transition-colors ${mostrarEspeciales ? 'bg-green-600' : 'bg-stone-400'}`}
-                >
-                  <div className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform ${mostrarEspeciales ? 'translate-x-7' : 'translate-x-0'}`} />
-                </button>
-              </div>
-            )}
-
-            <button
-              onClick={abrirModalCreacion}
-              className="bg-[#30312E] text-[#D3CCBC] px-8 py-4 rounded-3xl font-bold hover:bg-[#4a4b46] transition-all shadow-xl flex items-center gap-2"
-            >
-              <span className="text-2xl">+</span> AÑADIR PRODUCTO
+          <div className="flex items-center gap-2 bg-[#E2DBC9] px-4 py-1.5 rounded-2xl border border-[#30312E]/10 shadow-sm transition-transform hover:scale-105">
+            <span className="text-sm font-bold text-[#30312E]">{adminNombre}</span>
+            <button onClick={cerrarSesion} className="ml-2 text-red-800 hover:text-red-900 font-bold text-[10px] bg-red-50 px-3 py-1 rounded-lg transition-all uppercase">
+              Cerrar Sesión
             </button>
           </div>
-        </header>
-
+      </div>
+      <div className="p-4 md:p-10 max-w-7xl mx-auto">
+        
         {/* NAVEGACIÓN DE VISTAS (TABS) */}
-        <div className="flex gap-4 mb-8 border-b border-[#30312E]/10 pb-4">
+        <div className="flex gap-2 sm:gap-4 mb-8 border-b border-[#30312E]/10 pb-4">
           <button 
             onClick={() => setVistaActual('productos')}
-            className={`px-6 py-2 rounded-xl font-bold transition-all ${vistaActual === 'productos' ? 'bg-[#30312E] text-[#D3CCBC]' : 'text-[#30312E]/60 hover:bg-white/40'}`}
+            className={`px-2 py-2 sm:px-6 sm:py-2 rounded-xl font-bold transition-all ${vistaActual === 'productos' ? 'bg-[#30312E] text-[#D3CCBC]' : 'text-[#30312E]/60 hover:bg-white/40'}`}
           >
             Productos
           </button>
           <button 
             onClick={() => setVistaActual('reservas')}
-            className={`px-6 py-2 rounded-xl font-bold transition-all ${vistaActual === 'reservas' ? 'bg-[#30312E] text-[#D3CCBC]' : 'text-[#30312E]/60 hover:bg-white/40'}`}
+            className={`px-6  py-2 rounded-xl font-bold transition-all ${vistaActual === 'reservas' ? 'bg-[#30312E] text-[#D3CCBC]' : 'text-[#30312E]/60 hover:bg-white/40'}`}
           >
             Reservas
           </button>
@@ -421,6 +396,32 @@ const PanelAdmin: React.FC = () => {
           </button>
         </div>
 
+        {/* CONTROLES DE PRODUCTOS (BAJO LAS TABS) */}
+        {vistaActual === 'productos' && (
+          <header className="flex flex-col lg:flex-row justify-end items-center lg:items-center mb-6 gap-3 lg:gap-6">
+            <div className="flex flex-row items-center justify-center gap-3 w-full lg:w-auto">
+              {/* TOGGLE ESPECIALES */}
+              <div className="flex items-center gap-2 lg:gap-4 bg-[#E2DBC9] p-2 lg:p-3 rounded-2xl lg:rounded-3xl shadow-sm border border-[#30312E]/10">
+                <span className="text-xs lg:text-sm font-bold text-[#30312E] uppercase">Especiales:</span>
+                <button
+                  onClick={alternarEspeciales}
+                  className={`w-10 h-5 lg:w-14 lg:h-7 flex items-center rounded-full p-1 transition-colors ${mostrarEspeciales ? 'bg-green-600' : 'bg-stone-400'}`}
+                >
+                  <div className={`bg-white w-3 h-3 lg:w-5 lg:h-5 rounded-full shadow-md transform transition-transform ${mostrarEspeciales ? 'translate-x-5 lg:translate-x-7' : 'translate-x-0'}`} />
+                </button>
+              </div>
+
+              {/* BOTÓN AÑADIR PRODUCTO */}
+              <button
+                onClick={abrirModalCreacion}
+                className="bg-[#30312E] text-[#D3CCBC] px-4 py-2 lg:px-6 lg:py-3 rounded-2xl lg:rounded-3xl text-xs lg:text-sm font-bold hover:bg-[#4a4b46] transition-all shadow-lg flex items-center gap-2 whitespace-nowrap"
+              >
+                <span className="text-lg lg:text-xl">+</span> AÑADIR PRODUCTO
+              </button>
+            </div>
+          </header>
+        )}
+
         {/* CONTENIDO DINÁMICO */}
         {vistaActual === 'productos' ? (
           <>
@@ -430,7 +431,7 @@ const PanelAdmin: React.FC = () => {
                 <button
                   key={tipo}
                   onClick={() => setFiltroActivo(tipo)}
-                  className={`px-8 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all ${
+                  className={`px-2 py-2 sm:px-6 sm:py-2 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${
                     filtroActivo === tipo ? 'bg-[#30312E] text-[#D3CCBC] shadow-lg' : 'bg-[#E2DBC9] text-[#30312E]/60 hover:bg-white'
                   }`}
                 >
