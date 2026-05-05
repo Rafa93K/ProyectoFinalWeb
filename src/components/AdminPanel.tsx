@@ -50,7 +50,7 @@ const PanelAdmin: React.FC = () => {
     descripcion: '',
     precio: 0,
     tipo: 'carta',
-    subtipo: 'carnes',
+    subtipo: 'carne',
     imagen: ''
   });
   const [archivoImagen, setArchivoImagen] = useState<File | null>(null);
@@ -60,9 +60,9 @@ const PanelAdmin: React.FC = () => {
   const [ejecutandoEliminacion, setEjecutandoEliminacion] = useState(false);
 
   const subtiposPorTipo: Record<string, string[]> = {
-    carta: ['entrantes', 'carnes', 'pescados','pastas', 'postres'],
-    vinos: ['tintos', 'blancos', 'rosados', 'espumosos'],
-    especial: ['sugerencias', 'temporada']
+    carta: ['entrante', 'carne', 'pescado','pasta', 'postre'],
+    vinos: ['tinto', 'blanco', 'rosado', 'espumoso'],
+    especial: ['sugerencia', 'temporada']
   };
 
   // --- LÓGICA DE RESERVAS ---
@@ -338,7 +338,7 @@ const PanelAdmin: React.FC = () => {
 
   const abrirModalCreacion = () => {
     setProductoEditando(null);
-    setDatosFormulario({ nombre: '', descripcion: '', precio: 0, tipo: 'carta', subtipo: 'carnes', imagen: '' });
+    setDatosFormulario({ nombre: '', descripcion: '', precio: 0, tipo: 'carta', subtipo: 'carne', imagen: '' });
     setArchivoImagen(null);
     setModalAbierto(true);
   };

@@ -70,7 +70,7 @@ const PasswordOlvido: React.FC = () => {
                     ) : (
                         <div className="text-center py-6">
                             <div className="bg-green-100 text-green-800 p-4 rounded-xl mb-6">
-                                ¡Correo enviado con éxito! Revisa tu bandeja de entrada.
+                                ¡Correo enviado con éxito! Revisa tu bandeja de entrada o spam.
                             </div>
                         </div>
                     )}
