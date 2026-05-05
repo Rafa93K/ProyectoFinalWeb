@@ -12,8 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $telefono = isset($_POST['telefono']) ? $_POST['telefono'] : null;
     $contrasena = isset($_POST['contrasena']) ? $_POST['contrasena'] : null;
     $confirmar_password = isset($_POST['confirmar_password']) ? $_POST['confirmar_password'] : null;
+    $email = isset($_POST['email']) ? $_POST['email'] : null;
 
-    if (!$nombre || !$telefono || !$contrasena || !$confirmar_password) {
+    if (!$nombre || !$telefono || !$contrasena || !$confirmar_password || !$email) {
         echo json_encode(["success" => false, "message" => "Faltan datos en el formulario"]);
         exit;
     }
@@ -29,26 +30,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        // 1. Verificar si el teléfono ya existe
-        $sqlCheck = "SELECT nombre FROM Usuario WHERE telefono = :tel LIMIT 1";
+        // 1. Verificar si el teléfono o el email ya existen
+        $sqlCheck = "SELECT nombre FROM Usuario WHERE telefono = :tel OR email = :email LIMIT 1";
         $stmtCheck = $pdo->prepare($sqlCheck);
-        $stmtCheck->execute(['tel' => $telefono]);
+        $stmtCheck->execute(['tel' => $telefono, 'email' => $email]);
         
-        if ($stmtCheck->fetch()) {
-            echo json_encode(["success" => false, "message" => "Este teléfono ya está registrado"]);
+        $usuarioExistente = $stmtCheck->fetch();
+        if ($usuarioExistente) {
+            echo json_encode(["success" => false, "message" => "El teléfono o el correo ya están registrados"]);
             exit;
         }
 
         // 2. Insertar (Ciframos la contraseña)
         $passHash = password_hash($contrasena, PASSWORD_BCRYPT);
         
-        $sqlInsert = "INSERT INTO Usuario (nombre, telefono, contrasena) VALUES (:nom, :tel, :pass)";
+        $sqlInsert = "INSERT INTO Usuario (nombre, telefono, email, contrasena) VALUES (:nom, :tel, :email, :pass)";
         $stmtInsert = $pdo->prepare($sqlInsert);
         
         $resultado = $stmtInsert->execute([
-            'nom'  => $nombre,
-            'tel'  => $telefono,
-            'pass' => $passHash
+            'nom'   => $nombre,
+            'tel'   => $telefono,
+            'email' => $email,
+            'pass'  => $passHash
         ]);
 
         if ($resultado) {

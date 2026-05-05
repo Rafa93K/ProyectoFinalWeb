@@ -78,6 +78,14 @@ const Login: React.FC = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
+                        <div className="flex justify-end mt-2">
+                            <a 
+                                href="/recuperar-password" 
+                                className="text-xs text-[#30312E] hover:underline font-semibold"
+                            >
+                                ¿Has olvidado la contraseña?
+                            </a>
+                        </div>
                     </div>
 
                     <button
