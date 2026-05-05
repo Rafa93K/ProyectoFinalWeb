@@ -242,7 +242,7 @@ const PanelUsuario: React.FC = () => {
             <div className="max-w-5xl mx-auto">
                 <header className="mb-10 text-center">
                     <h1 className="text-2xl md:text-4xl font-bold text-stone-800 mb-2 font-serif">Mi Panel Personal</h1>
-                    <p className="text-sm text-stone-500">Hola, <span className="font-bold text-[#30312E]">{usuario?.nombre}</span>. Aquí puedes gestionar tus reservas y ver tus platos favoritos.</p>
+                    <p className="text-base text-stone-500">Hola, <span className="font-bold text-[#30312E]">{usuario?.nombre}</span>. Aquí puedes gestionar tus reservas y ver tus platos favoritos.</p>
                 </header>
                 <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 items-start">
                     {/* COLUMNA IZQUIERDA: RESERVAS */}
@@ -273,22 +273,22 @@ const PanelUsuario: React.FC = () => {
                                             {/* BARRA DE INFO RESPONSIVA */}
                                             <div className="flex flex-row justify-between items-center bg-[#D3CCBC] p-3 md:p-4 rounded-xl gap-2">
                                                 <div className="flex flex-col shrink-0">
-                                                    <span className="text-[9px] md:text-[10px] font-black text-[#30312E]/40 uppercase tracking-tighter md:tracking-widest">Fecha</span>
-                                                    <span className="font-bold text-stone-800 text-[13px] md:text-base">{new Date(reserva.fecha).toLocaleDateString()}</span>
+                                                    <span className="text-[11px] md:text-[12px] font-black text-[#30312E]/40 uppercase tracking-tighter md:tracking-widest">Fecha</span>
+                                                    <span className="font-bold text-stone-800 text-[15px] md:text-lg">{new Date(reserva.fecha).toLocaleDateString()}</span>
                                                 </div>
                                                 <div className="flex flex-col items-center shrink-0">
-                                                    <span className="text-[9px] md:text-[10px] font-black text-[#30312E]/40 uppercase tracking-tighter md:tracking-widest">Hora</span>
-                                                    <span className="font-bold text-stone-800 text-[13px] md:text-base">{reserva.hora.substring(0, 5)}</span>
+                                                    <span className="text-[11px] md:text-[12px] font-black text-[#30312E]/40 uppercase tracking-tighter md:tracking-widest">Hora</span>
+                                                    <span className="font-bold text-stone-800 text-[15px] md:text-lg">{reserva.hora.substring(0, 5)}</span>
                                                 </div>
                                                 <div className="flex flex-col items-end shrink-0">
-                                                    <span className="text-[9px] md:text-[10px] font-black text-[#30312E]/40 uppercase tracking-tighter md:tracking-widest">Pax</span>
-                                                    <span className="font-bold text-stone-800 text-[13px] md:text-base">{reserva.personas} pers.</span>
+                                                    <span className="text-[11px] md:text-[12px] font-black text-[#30312E]/40 uppercase tracking-tighter md:tracking-widest">Pax</span>
+                                                    <span className="font-bold text-stone-800 text-[15px] md:text-lg">{reserva.personas} pers.</span>
                                                 </div>
                                             </div>
 
                                             {reserva.mensaje && (
                                                 <div className="px-1">
-                                                    <p className="text-xs text-stone-500 italic leading-relaxed line-clamp-3">"{reserva.mensaje}"</p>
+                                                    <p className="text-sm text-stone-500 italic leading-relaxed line-clamp-3">"{reserva.mensaje}"</p>
                                                 </div>
                                             )}
                                         </div>

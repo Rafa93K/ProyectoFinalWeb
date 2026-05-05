@@ -205,12 +205,12 @@ const Carta: React.FC = () => {
                       {/* Información del producto */}
                       <div className="flex-1 flex flex-col">
                         <div className="flex justify-between items-start mb-2">
-                          <h3 className="text-xl font-bold text-[#30312E] leading-tight">{item.nombre}</h3>
-                          <span className="text-lg font-bold text-[#30312E] ml-4">
+                          <h3 className="text-2xl md:text-xl font-bold text-[#30312E] leading-tight">{item.nombre}</h3>
+                          <span className="text-xl md:text-lg font-bold text-[#30312E] ml-4">
                             {typeof item.precio === 'string' ? parseFloat(item.precio).toFixed(2) : item.precio}€
                           </span>
                         </div>
-                        <p className="text-[#30312E]/70 text-xs md:text-sm leading-relaxed mb-4 line-clamp-2 md:line-clamp-none">
+                        <p className="text-sm md:text-sm text-[#30312E]/70 leading-relaxed mb-4 line-clamp-2 md:line-clamp-none">
                           {item.descripcion}
                         </p>
                         
@@ -218,25 +218,28 @@ const Carta: React.FC = () => {
                         <div className="mt-auto flex flex-col md:flex-row md:items-center justify-between gap-2 border-t border-[#30312E]/5 pt-3">
                           <div className="flex items-center gap-1.5">
                             <div className="flex">
-                              {[1, 2, 3, 4, 5].map((estrella) => (
-                                <button
-                                  key={estrella}
-                                  onClick={() => manejarVoto(item.id_producto, estrella)}
-                                  disabled={!usuario}
-                                  className={`text-lg md:text-xl transition-all duration-200 transform ${
-                                    usuario ? 'hover:scale-125 active:scale-95' : 'cursor-default'
-                                  } ${
-                                    (item.mi_puntuacion && estrella <= (item.mi_puntuacion as number))
-                                    ? 'text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.3)]'
-                                    : 'text-stone-300'
-                                  }`}
-                                  title={usuario ? `Puntuar con ${estrella} estrellas` : 'Inicia sesión para puntuar'}
-                                >
-                                  ★
-                                </button>
-                              ))}
+                              {[1, 2, 3, 4, 5].map((estrella) => {
+                                const puntuacionReferencia = item.mi_puntuacion || Number(item.media_votos) || 0;
+                                return (
+                                  <button
+                                    key={estrella}
+                                    onClick={() => manejarVoto(item.id_producto, estrella)}
+                                    disabled={!usuario}
+                                    className={`text-lg md:text-xl transition-all duration-200 transform ${
+                                      usuario ? 'hover:scale-125 active:scale-95' : 'cursor-default'
+                                    } ${
+                                      estrella <= Math.round(puntuacionReferencia)
+                                      ? 'text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.3)]'
+                                      : 'text-stone-300'
+                                    }`}
+                                    title={usuario ? `Puntuar con ${estrella} estrellas` : 'Inicia sesión para puntuar'}
+                                  >
+                                    ★
+                                  </button>
+                                );
+                              })}
                             </div>
-                            <span className="text-[10px] md:text-xs font-bold text-[#30312E]/50 uppercase tracking-widest ml-1">
+                            <span className="text-xs md:text-xs font-bold text-[#30312E]/50 uppercase tracking-widest ml-1">
                               {item.media_votos || '0.0'} ({item.total_votos || 0})
                             </span>
                           </div>

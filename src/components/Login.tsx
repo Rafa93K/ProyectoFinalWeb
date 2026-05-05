@@ -46,8 +46,8 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="flex-1 flex items-center justify-center p-6 bg-[#D3CCBC]/30">
-            <div className="w-full max-w-sm bg-[#E2DBC9] rounded-3xl shadow-2xl overflow-hidden border border-white/20 animate-fadeIn">
+        <div className="flex-1 flex items-center justify-center p-0 md:p-6 bg-[#D3CCBC]/30 min-h-[calc(100vh-80px)]">
+            <div className="w-full md:max-w-sm h-full md:h-auto bg-[#E2DBC9] rounded-none md:rounded-3xl shadow-2xl overflow-hidden border border-white/20 animate-fadeIn flex flex-col justify-center">
                 <div className="bg-[#30312E] p-8 text-center">
                     <h2 className="text-3xl font-bold text-[#D3CCBC] font-serif">Bienvenido</h2>
                     <p className="text-[#D3CCBC]/70 text-sm mt-2">Accede a tu cuenta</p>

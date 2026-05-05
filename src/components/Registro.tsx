@@ -7,6 +7,7 @@ const Registro: React.FC = () => {
     const [datos, setDatos] = useState({
         nombre: '',
         telefono: '',
+        email: '',
         password: '',
         confirmPassword: ''
     });
@@ -31,6 +32,7 @@ const Registro: React.FC = () => {
             const formData = new FormData();
             formData.append('nombre', datos.nombre);
             formData.append('telefono', datos.telefono);
+            formData.append('email', datos.email);
             formData.append('contrasena', datos.password);
             formData.append('confirmar_password', datos.confirmPassword);
 
@@ -47,7 +49,8 @@ const Registro: React.FC = () => {
                 const usuarioData = {
                     id_usuario: result.id_usuario,
                     nombre: datos.nombre,
-                    telefono: datos.telefono
+                    telefono: datos.telefono,
+                    email: datos.email
                 };
                 localStorage.setItem('usuarioSesion', JSON.stringify(usuarioData));
                 window.location.href = '/home';
@@ -61,8 +64,8 @@ const Registro: React.FC = () => {
     };
 
     return (
-        <div className="flex-1 flex items-center justify-center p-6 bg-[#D3CCBC]/30">
-            <div className="w-full max-w-md bg-[#E2DBC9] rounded-3xl shadow-2xl overflow-hidden border border-white/20 animate-fadeIn">
+        <div className="flex-1 flex items-center justify-center p-0 md:p-6 bg-[#D3CCBC]/30 min-h-[calc(100vh-80px)]">
+            <div className="w-full md:max-w-md h-full md:h-auto bg-[#E2DBC9] rounded-none md:rounded-3xl shadow-2xl overflow-hidden border border-white/20 animate-fadeIn flex flex-col justify-center">
                 {/* Cabecera del Formulario */}
                 <div className="bg-[#30312E] p-8 text-center">
                     <h2 className="text-3xl font-bold text-[#D3CCBC] mb-2 font-serif">Crear Cuenta</h2>
@@ -86,7 +89,7 @@ const Registro: React.FC = () => {
                     <div>
                         <label className="block text-xs font-bold text-stone-500 mb-2 uppercase tracking-widest">Teléfono de Contacto</label>
                         <input
-                            type="tel"
+                            type="text"
                             required
                             minLength={9}
                             maxLength={9}
@@ -94,6 +97,17 @@ const Registro: React.FC = () => {
                             className="w-full px-4 py-3 rounded-xl border border-stone-100 focus:ring-2 focus:ring-[#30312E] outline-none transition-all bg-[#D4CDBC]"
                             value={datos.telefono}
                             onChange={(e) => setDatos({ ...datos, telefono: e.target.value })}
+                        />
+                    </div>
+                     <div>
+                        <label className="block text-xs font-bold text-stone-500 mb-2 uppercase tracking-widest">Correo electronico</label>
+                        <input
+                            type="email"
+                            required
+                            placeholder="ejemplo@ejemplo.com"
+                            className="w-full px-4 py-3 rounded-xl border border-stone-100 focus:ring-2 focus:ring-[#30312E] outline-none transition-all bg-[#D4CDBC]"
+                            value={datos.email}
+                            onChange={(e) => setDatos({ ...datos, email: e.target.value })}
                         />
                     </div>
 
