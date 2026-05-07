@@ -6,8 +6,8 @@ import { showNotification } from './Notification';
  * Permite a los usuarios elegir fecha, hora (validada dinámicamente) y número de comensales.
  */
 export const Reservar: React.FC = () => {
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
+    const navegar = useNavigate();
+    const [datosFormulario, setDatosFormulario] = useState({
         nombre_cliente: '',
         telefono: '',
         fecha: '',
@@ -17,18 +17,18 @@ export const Reservar: React.FC = () => {
     });
     const [enviando, setEnviando] = useState(false);
     const [completado, setCompletado] = useState(false);
-    const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+    const [horariosDisponibles, setHorariosDisponibles] = useState<string[]>([]);
 
     useEffect(() => {
         // Cargar datos de usuario si existe sesión
-        const sesionRaw = localStorage.getItem('usuarioSesion');
-        if (sesionRaw) {
+        const sesionLocal = localStorage.getItem('usuarioSesion');
+        if (sesionLocal) {
             try {
-                const user = JSON.parse(sesionRaw);
-                setFormData(prev => ({
+                const usuario = JSON.parse(sesionLocal);
+                setDatosFormulario(prev => ({
                     ...prev,
-                    nombre_cliente: user.nombre || '',
-                    telefono: user.telefono || ''
+                    nombre_cliente: usuario.nombre || '',
+                    telefono: usuario.telefono || ''
                 }));
             } catch (e) {
                 console.error("Error al leer la sesión", e);
@@ -38,63 +38,63 @@ export const Reservar: React.FC = () => {
 
     // Cálculo dinámico de horarios disponibles
     useEffect(() => {
-        if (!formData.fecha) {
-            setAvailableSlots([]);
+        if (!datosFormulario.fecha) {
+            setHorariosDisponibles([]);
             return;
         }
 
-        const [year, month, day] = formData.fecha.split('-').map(Number);
-        const date = new Date(year, month - 1, day);
-        const dayOfWeek = date.getDay(); // 0: Dom, 1: Lun, 2: Mar, 3: Mie, 4: Jue, 5: Vie, 6: Sab
+        const [anio, mes, dia] = datosFormulario.fecha.split('-').map(Number);
+        const fechaObj = new Date(anio, mes - 1, dia);
+        const diaSemana = fechaObj.getDay(); // 0: Dom, 1: Lun, 2: Mar, 3: Mie, 4: Jue, 5: Vie, 6: Sab
 
         // Martes Cerrado
-        if (dayOfWeek === 2) {
-            setAvailableSlots(['CERRADO']);
-            if (formData.hora) setFormData(prev => ({ ...prev, hora: '' }));
+        if (diaSemana === 2) {
+            setHorariosDisponibles(['CERRADO']);
+            if (datosFormulario.hora) setDatosFormulario(prev => ({ ...prev, hora: '' }));
             return;
         }
 
-        const slots: string[] = [];
+        const turnos: string[] = [];
         
         // Turno Mediodía: 13:30 - 15:30 (Todos los días excepto Martes)
         for (let h = 13; h <= 15; h++) {
             for (let m = 0; m < 60; m += 15) {
-                const time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-                if (time >= "13:30" && time <= "15:30") {
-                    slots.push(time);
+                const hora = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                if (hora >= "13:30" && hora <= "15:30") {
+                    turnos.push(hora);
                 }
             }
         }
 
         // Turno Noche: 20:30 - 22:30 (Solo Viernes [5] y Sábado [6])
-        if (dayOfWeek === 5 || dayOfWeek === 6) {
+        if (diaSemana === 5 || diaSemana === 6) {
             for (let h = 20; h <= 22; h++) {
                 for (let m = 0; m < 60; m += 15) {
-                    const time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-                    if (time >= "20:30" && time <= "22:30") {
-                        slots.push(time);
+                    const hora = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                    if (hora >= "20:30" && hora <= "22:30") {
+                        turnos.push(hora);
                     }
                 }
             }
         }
 
-        setAvailableSlots(slots);
+        setHorariosDisponibles(turnos);
         
         // Resetear hora si la seleccionada ya no es válida para el nuevo día
-        if (formData.hora && !slots.includes(formData.hora)) {
-            setFormData(prev => ({ ...prev, hora: '' }));
+        if (datosFormulario.hora && !turnos.includes(datosFormulario.hora)) {
+            setDatosFormulario(prev => ({ ...prev, hora: '' }));
         }
-    }, [formData.fecha]);
+    }, [datosFormulario.fecha]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const manejarCambio = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setDatosFormulario(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (e: React.SubmitEvent) => {
+    const manejarEnvio = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (formData.telefono.length !== 9) {
+        if (datosFormulario.telefono.length !== 9) {
             showNotification('El número de teléfono debe tener exactamente 9 dígitos', 'error');
             return;
         }
@@ -102,41 +102,41 @@ export const Reservar: React.FC = () => {
         setEnviando(true);
 
         try {
-            const data = new FormData();
-            Object.entries(formData).forEach(([key, value]) => {
-                data.append(key, value.toString());
+            const datosParaEnviar = new FormData();
+            Object.entries(datosFormulario).forEach(([llave, valor]) => {
+                datosParaEnviar.append(llave, valor.toString());
             });
 
             // Adjuntar IDs de sesión si existen
-            const userSesion = localStorage.getItem('usuarioSesion');
-            if (userSesion) {
+            const sesionUsuario = localStorage.getItem('usuarioSesion');
+            if (sesionUsuario) {
                 try {
-                    const user = JSON.parse(userSesion);
-                    if (user.id) data.append('id_usuario', user.id);
+                    const usuario = JSON.parse(sesionUsuario);
+                    if (usuario.id) datosParaEnviar.append('id_usuario', usuario.id);
                 } catch(e) {}
             }
 
-            const adminSesion = localStorage.getItem('adminSesion');
-            if (adminSesion) {
+            const sesionAdmin = localStorage.getItem('adminSesion');
+            if (sesionAdmin) {
                 try {
-                    const admin = JSON.parse(adminSesion);
-                    if (admin.id) data.append('id_admin', admin.id || admin.id_admin);
+                    const admin = JSON.parse(sesionAdmin);
+                    if (admin.id) datosParaEnviar.append('id_admin', admin.id || admin.id_admin);
                 } catch(e) {}
             }
 
-            const response = await fetch('https://rafa.cicloflorenciopintado.es/guardarReserva.php', {
+            const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/guardarReserva.php', {
                 method: 'POST',
-                body: data
+                body: datosParaEnviar
             });
 
-            const result = await response.json();
-            if (result.success) {
+            const resultado = await respuesta.json();
+            if (resultado.success) {
                 setCompletado(true);
                 showNotification('Reserva confirmada correctamente', 'success');
                 // Redirigir tras un breve retraso
-                setTimeout(() => navigate('/mis-reservas'), 3000);
+                setTimeout(() => navegar('/mis-reservas'), 3000);
             } else {
-                showNotification(result.message || 'Hubo un error al procesar tu reserva. Inténtalo de nuevo.', 'error');
+                showNotification(resultado.message || 'Hubo un error al procesar tu reserva. Inténtalo de nuevo.', 'error');
             }
         } catch (error) {
             showNotification('No se pudo conectar con el servidor.', 'error');
@@ -150,7 +150,7 @@ export const Reservar: React.FC = () => {
             <div className="flex-1 bg-[#D3CCBC] flex items-center justify-center p-6">
                 <div className="bg-[#D3CCBC] p-12 rounded-3xl shadow-2xl text-center max-w-lg w-full animate-fadeIn">
                     <h2 className="text-3xl font-serif font-bold text-[#30312E] mb-4">¡Reserva Confirmada!</h2>
-                    <p className="text-stone-500 mb-8">Gracias, <span className="font-bold">{formData.nombre_cliente}</span>. Hemos recibido tu solicitud correctamente.</p>
+                    <p className="text-stone-500 mb-8">Gracias, <span className="font-bold">{datosFormulario.nombre_cliente}</span>. Hemos recibido tu solicitud correctamente.</p>
                     <p className="text-sm text-stone-500 italic">Redirigiéndote a tu panel...</p>
                 </div>
             </div>
@@ -167,7 +167,7 @@ export const Reservar: React.FC = () => {
                         <p className="text-[#D3CCBC]/60 font-medium tracking-wide">VIVE UNA EXPERIENCIA GASTRONÓMICA ÚNICA</p>
                     </div>
                     
-                    <form onSubmit={handleSubmit} className="p-8 md:p-14 space-y-8">
+                    <form onSubmit={manejarEnvio} className="p-8 md:p-14 space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {/* Nombre */}
                             <div className="space-y-2">
@@ -176,8 +176,8 @@ export const Reservar: React.FC = () => {
                                     required
                                     type="text" 
                                     name="nombre_cliente"
-                                    value={formData.nombre_cliente}
-                                    onChange={handleChange}
+                                    value={datosFormulario.nombre_cliente}
+                                    onChange={manejarCambio}
                                     className="w-full px-5 py-4 rounded-2xl border border-stone-100 focus:border-[#30312E] focus:ring-2 focus:ring-[#30312E]/10 outline-none transition-all bg-[#d4cdbc] text-stone-800"
                                     placeholder="Ej: Rafael García"
                                 />
@@ -192,8 +192,8 @@ export const Reservar: React.FC = () => {
                                     name="telefono"
                                     minLength={9}
                                     maxLength={9}
-                                    value={formData.telefono}
-                                    onChange={handleChange}
+                                    value={datosFormulario.telefono}
+                                    onChange={manejarCambio}
                                     className="w-full px-5 py-4 rounded-2xl border border-stone-100 focus:border-[#30312E] focus:ring-2 focus:ring-[#30312E]/10 outline-none transition-all bg-[#d4cdbc] text-stone-800"
                                     placeholder="600000000"
                                 />
@@ -206,8 +206,8 @@ export const Reservar: React.FC = () => {
                                     required
                                     type="date" 
                                     name="fecha"
-                                    value={formData.fecha}
-                                    onChange={handleChange}
+                                    value={datosFormulario.fecha}
+                                    onChange={manejarCambio}
                                     min={new Date().toISOString().split('T')[0]}
                                     className="w-full px-5 py-4 rounded-2xl border border-stone-100 focus:border-[#30312E] focus:ring-2 focus:ring-[#30312E]/10 outline-none transition-all bg-[#d4cdbc] text-stone-800"
                                 />
@@ -219,21 +219,21 @@ export const Reservar: React.FC = () => {
                                 <select 
                                     required
                                     name="hora"
-                                    value={formData.hora}
-                                    onChange={handleChange}
-                                    disabled={!formData.fecha || availableSlots[0] === 'CERRADO'}
+                                    value={datosFormulario.hora}
+                                    onChange={manejarCambio}
+                                    disabled={!datosFormulario.fecha || horariosDisponibles[0] === 'CERRADO'}
                                     className={`w-full px-5 py-4 rounded-2xl border border-stone-100 focus:border-[#30312E] focus:ring-2 focus:ring-[#30312E]/10 outline-none transition-all bg-[#d4cdbc] text-stone-800 cursor-pointer ${
-                                        (!formData.fecha || availableSlots[0] === 'CERRADO') ? 'opacity-50 cursor-not-allowed' : ''
+                                        (!datosFormulario.fecha || horariosDisponibles[0] === 'CERRADO') ? 'opacity-50 cursor-not-allowed' : ''
                                     }`}
                                 >
-                                    {!formData.fecha ? (
+                                    {!datosFormulario.fecha ? (
                                         <option value="">Selecciona fecha primero</option>
-                                    ) : availableSlots[0] === 'CERRADO' ? (
+                                    ) : horariosDisponibles[0] === 'CERRADO' ? (
                                         <option value="">MARTES CERRADO</option>
                                     ) : (
                                         <>
                                             <option value="">-- Elige una hora --</option>
-                                            {availableSlots.map(slot => (
+                                            {horariosDisponibles.map(slot => (
                                                 <option key={slot} value={slot}>{slot}</option>
                                             ))}
                                         </>
@@ -251,8 +251,8 @@ export const Reservar: React.FC = () => {
                                     name="personas"
                                     min="1"
                                     max="50"
-                                    value={formData.personas}
-                                    onChange={handleChange}
+                                    value={datosFormulario.personas}
+                                    onChange={manejarCambio}
                                     className="w-full px-5 py-4 rounded-2xl border border-stone-100 focus:border-[#30312E] focus:ring-2 focus:ring-[#30312E]/10 outline-none transition-all bg-[#d4cdbc] text-stone-800"
                                     placeholder="2"
                                     required
@@ -270,8 +270,8 @@ export const Reservar: React.FC = () => {
                             <label className="text-sm uppercase tracking-widest font-bold text-stone-500 block ml-1">Mensaje o Peticiones Especiales</label>
                             <textarea 
                                 name="mensaje"
-                                value={formData.mensaje}
-                                onChange={handleChange}
+                                value={datosFormulario.mensaje}
+                                onChange={manejarCambio}
                                 rows={3}
                                 className="w-full px-5 py-4 rounded-2xl border border-stone-300 focus:border-[#30312E] focus:ring-2 focus:ring-[#30312E]/10 outline-none transition-all bg-[#d4cdbc] text-stone-800"
                                 placeholder="Alergias, mesa en ventana, silla de bebé..."
