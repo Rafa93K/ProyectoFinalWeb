@@ -45,7 +45,7 @@ const Notification: React.FC<NotificationProps> = ({ message, type, onClose }) =
           onClick={() => { setIsExiting(true); setTimeout(onClose, 500); }}
           className="text-white/40 hover:text-white transition-colors text-xl font-bold"
         >
-          ×
+          x
         </button>
       </div>
     </div>
