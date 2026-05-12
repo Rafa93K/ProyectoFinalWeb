@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 export const Header = () => {
     return (
         <header className="flex flex-col md:flex-row items-center justify-between px-4 md:px-12 py-6 md:py-4 bg-[#30312E] shadow-xl border-b border-[#D3CCBC]/10 gap-6 md:gap-0">
-            <div className="w-40 md:w-48 transition-transform duration-300 hover:scale-110">
+            <div className="relative w-40 md:w-48 transition-transform duration-300 hover:scale-110">
                 <Link to="/">
                     <img src="/Img/fogone_clarito.png" alt="Logo" className="w-full h-auto drop-shadow-lg" />
                 </Link>

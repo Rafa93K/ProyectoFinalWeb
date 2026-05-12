@@ -1,6 +1,6 @@
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { Home } from './components/Home';
 import { Conocenos } from './components/Conocenos';
 import { AvisoLegal } from './components/AvisoLegal';
@@ -44,15 +44,17 @@ function App() {
         <Route path="/privacidad" element={<Privacidad />} />
         <Route path="/cookies" element={<Cookies />} />
         {/* Rutas de Administración */}
-        <Route path="/admin" element={
+        <Route path="/adminF" element={
           localStorage.getItem('adminSesion') ? <PanelAdmin /> : <AdminLogin />
         } />
-        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/adminF/login" element={<AdminLogin />} />
         {/* Rutas de Usuario */}
         <Route path="/registro" element={<Registro />} />
         <Route path="/login" element={<Login />} />
         <Route path="/recuperar-password" element={<PasswordOlvido />} />
         <Route path="/reset-password/:token" element={<PasswordReset />} />
+        {/* Redirección para rutas no encontradas */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       
       <Footer />

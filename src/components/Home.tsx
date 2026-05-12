@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-
+import { GoogleReviews } from './GoogleReviews';
 /**
  * Componente de la Página de Inicio (Home)
  * Muestra las secciones principales de bienvenida y experiencia.
@@ -49,7 +49,7 @@ export const Home = () => {
           </div>
         </div>
       </section>
-
+      <GoogleReviews />
       {/* Cita Final o Separador */}
       <section className="bg-[#30312E] py-8 text-center text-[#D3CCBC]">
         <p className="text-2xl italic">"Más que un restaurante, un fogón compartido"</p>
