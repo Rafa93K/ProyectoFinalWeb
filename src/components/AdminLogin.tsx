@@ -12,7 +12,7 @@ const AdminLogin: React.FC = () => {
         // Si ya hay sesión de admin, redirigir directamente
         const adminSesion = localStorage.getItem('adminSesion');
         if (adminSesion) {
-            navegar('/admin');
+            navegar('/adminF');
         }
     }, [navegar]);
 
@@ -39,7 +39,7 @@ const AdminLogin: React.FC = () => {
             const resultado = await respuesta.json();
 
             if (resultado.success) {
-                // Guardamos en la sesión el nombre y contraseña (o un token si lo prefieres)
+                // Guardamos en la sesión el nombre y contraseña 
                 // Usamos localStorage para que nos recuerde como pidió el usuario
                 localStorage.setItem('adminSesion', JSON.stringify({
                     nombre: nombre,
@@ -47,7 +47,7 @@ const AdminLogin: React.FC = () => {
                     timestamp: new Date().getTime()
                 }));
                 
-                navegar('/admin');
+                navegar('/adminF');
                 window.location.reload(); // Recargar para asegurar que el estado se actualiza
             } else {
                 setError(resultado.message || 'Credenciales incorrectas');
@@ -55,14 +55,6 @@ const AdminLogin: React.FC = () => {
         } catch (err) {
             console.error('Error en el login:', err);
             setError('Error de conexión con el servidor');
-            
-            // MOCK PARA PRUEBAS (Si el backend no está listo, permitir entrar con admin/admin)
-            if (nombre === 'admin' && password === 'admin') {
-                console.warn('Backend no encontrado, usando Mock temporal');
-                localStorage.setItem('adminSesion', JSON.stringify({ nombre: 'Administrador', auth: true }));
-                navegar('/admin');
-                window.location.reload();
-            }
         } finally {
             setCargando(false);
         }
