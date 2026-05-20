@@ -48,25 +48,18 @@ const AdminLogin: React.FC = () => {
                 }));
                 
                 navegar('/adminF');
+                navegar('/adminF');
                 window.location.reload(); // Recargar para asegurar que el estado se actualiza
             } else {
                 setError(resultado.message || 'Credenciales incorrectas');
-            }
-        } catch (err) {
-            console.error('Error en el login:', err);
-            setError('Error de conexión con el servidor');
-            
-            // MOCK PARA PRUEBAS (Si el backend no está listo, permitir entrar con admin/admin)
-            if (nombre === 'admin' && password === 'admin') {
-                console.warn('Backend no encontrado, usando Mock temporal');
-                localStorage.setItem('adminSesion', JSON.stringify({ nombre: 'Administrador', auth: true }));
-                navegar('/admin');
-                window.location.reload();
-            }
-        } finally {
-            setCargando(false);
         }
-    };
+    } catch (err) {
+        console.error('Error en el login:', err);
+        setError('Error de conexión con el servidor');
+    } finally {
+        setCargando(false);
+    }
+};
 
     return (
         <div className="min-h-[80vh] flex items-center justify-center p-6 bg-[#E2DBC9] relative overflow-hidden">
