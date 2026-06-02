@@ -50,7 +50,7 @@ const PanelAdmin: React.FC = () => {
     descripcion: '',
     precio: 0,
     tipo: 'carta',
-    subtipo: 'carne',
+    subtipo: 'carnes',
     imagen: ''
   });
   const [archivoImagen, setArchivoImagen] = useState<File | null>(null);
@@ -60,10 +60,12 @@ const PanelAdmin: React.FC = () => {
   const [ejecutandoEliminacion, setEjecutandoEliminacion] = useState(false);
 
   const subtiposPorTipo: Record<string, string[]> = {
-    carta: ['entrante', 'carne', 'pescado','pasta', 'postre'],
+    carta: ['entrantes', 'carnes', 'pescados','pastas', 'postres'],
     vinos: ['tinto', 'blanco', 'rosado', 'espumoso'],
-    especial: ['sugerencia', 'temporada']
+    especial: ['']
   };
+
+  // Nota: asumimos que el admin selecciona y guarda subtipos en plural desde el dropdown
 
   // --- LÓGICA DE RESERVAS ---
   const obtenerReservas = async (fechaSeleccionada: string) => {
@@ -289,7 +291,7 @@ const PanelAdmin: React.FC = () => {
     }
   };
 
-   const guardarCambios = async (e: React.FormEvent) => {
+  const guardarCambios = async (e: React.FormEvent) => {
   e.preventDefault();
   try {
     const url = productoEditando 
@@ -338,7 +340,7 @@ const PanelAdmin: React.FC = () => {
 
   const abrirModalCreacion = () => {
     setProductoEditando(null);
-    setDatosFormulario({ nombre: '', descripcion: '', precio: 0, tipo: 'carta', subtipo: 'carne', imagen: '' });
+    setDatosFormulario({ nombre: '', descripcion: '', precio: 0, tipo: 'carta', subtipo: 'carnes', imagen: '' });
     setArchivoImagen(null);
     setModalAbierto(true);
   };

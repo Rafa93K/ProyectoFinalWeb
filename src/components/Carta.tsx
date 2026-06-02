@@ -137,9 +137,29 @@ const Carta: React.FC = () => {
   const agruparPorTipo = () => {
     if (pestanaActiva === 'Especial') return { 'Nuestros Especiales': productos };
 
+    // Normaliza subtipo: trim, lowercase y mapea singular->plural conocido
+    const normalizeSubtipo = (s?: string | null) => {
+      if (!s) return '';
+      const key = String(s).toLowerCase().trim();
+      const map: Record<string, string> = {
+        entrante: 'entrantes',
+        entrantes: 'entrantes',
+        carne: 'carnes',
+        carnes: 'carnes',
+        pescado: 'pescados',
+        pescados: 'pescados',
+        pasta: 'pastas',
+        pastas: 'pastas',
+        postre: 'postres',
+        postres: 'postres'
+      };
+      return map[key] || key;
+    };
+
     const grupos: { [key: string]: Producto[] } = {};
     productos.forEach(p => {
-      const nombreGrupo = p.subtipo || 'General';
+      const nombreGrupoRaw = normalizeSubtipo(p.subtipo) || 'general';
+      const nombreGrupo = nombreGrupoRaw || 'General';
       if (!grupos[nombreGrupo]) grupos[nombreGrupo] = [];
       grupos[nombreGrupo].push(p);
     });
@@ -147,6 +167,33 @@ const Carta: React.FC = () => {
   };
 
   const productosAgrupados = agruparPorTipo();
+  const normalizeKey = (s?: string | null) => {
+    if (!s) return '';
+    const key = String(s).toLowerCase().trim();
+    const map: Record<string, string> = {
+      entrante: 'entrantes',
+      entrantes: 'entrantes',
+      carne: 'carnes',
+      carnes: 'carnes',
+      pescado: 'pescados',
+      pescados: 'pescados',
+      pasta: 'pastas',
+      pastas: 'pastas',
+      postre: 'postres',
+      postres: 'postres'
+    };
+    return map[key] || key;
+  };
+
+  const entradasAgrupadasOrdenadas = Object.entries(productosAgrupados)
+    .sort(([subtipoA], [subtipoB]) => {
+      const a = normalizeKey(subtipoA);
+      const b = normalizeKey(subtipoB);
+      if (a === b) return 0;
+      if (a === 'entrantes') return -1;
+      if (b === 'entrantes') return 1;
+      return a.localeCompare(b, 'es', { sensitivity: 'base' });
+    });
 
   return (
     <div className="flex-1 bg-[#D3CCBC] py-12 px-4 md:px-8">
@@ -185,10 +232,10 @@ const Carta: React.FC = () => {
         ) : (
           // Listado de productos agrupados
           <div className="space-y-16">
-            {Object.entries(productosAgrupados).map(([subtipo, items]) => (
+            {entradasAgrupadasOrdenadas.map(([subtipo, items]) => (
               <div key={subtipo} className="animate-fadeIn">
                 <h2 className="text-3xl font-serif font-bold text-[#30312E] mb-8 border-b-2 border-[#30312E]/20 pb-2 capitalize">
-                  {subtipo}
+                  {subtipo === 'Nuestros Especiales' ? subtipo : (subtipo.charAt(0).toUpperCase() + subtipo.slice(1))}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {items.map((item) => (
