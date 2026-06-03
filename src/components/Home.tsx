@@ -16,7 +16,7 @@ export const Home = () => {
         />
         <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center p-4">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
-            Bienvenido a El Fogón
+            Bienvenido al Fogón
           </h1>
           <p className="text-xl md:text-2xl text-white/90 font-medium italic">
             Donde cada plato cuenta una historia

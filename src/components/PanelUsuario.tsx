@@ -294,19 +294,19 @@ const PanelUsuario: React.FC = () => {
                                         </div>
 
                                         {/* BOTONES ACCIÓN RESPONSIVOS */}
-                                        <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-stone-800/5">
+                                        <div className="flex flex-row sm:flex-row gap-1 pt-2 border-t border-stone-800/5">
                                             <button
                                                 className="w-full sm:flex-1 px-4 py-2.5 rounded-xl text-[#30312E] text-[11px] font-bold hover:bg-white/50 transition-colors border border-[#30312E]/10 flex items-center justify-center gap-2 shadow-sm"
                                                 onClick={() => abrirModificacion(reserva)}
-                                            >
-                                                <span>✏️</span> Modificar
+                                            >                     
+                                                Modificar
                                             </button>
                                             <button
                                                 onClick={() => eliminarReserva(reserva.id_reserva)}
-                                                className="w-full sm:flex-1 px-4 py-2.5 rounded-xl text-red-800 text-[11px] font-bold hover:bg-red-50 transition-colors border border-red-100 flex items-center justify-center gap-2 shadow-sm"
+                                                className="w-full sm:flex-1 px-4 py-2.5 rounded-xl text-red-800 text-[11px] font-bold hover:bg-red-50 transition-colors border border-red-200 flex items-center justify-center gap-2 shadow-sm"
                                                 title="Cancelar Reserva"
-                                            >
-                                                <span>🗑️</span> Cancelar
+                                            >                           
+                                                Cancelar
                                             </button>
                                         </div>
                                     </div>
