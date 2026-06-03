@@ -39,7 +39,7 @@ const AdminLogin: React.FC = () => {
             const resultado = await respuesta.json();
 
             if (resultado.success) {
-                // Guardamos en la sesión el nombre y contraseña 
+                // Guardamos en la sesión el nombre 
                 // Usamos localStorage para que nos recuerde como pidió el usuario
                 localStorage.setItem('adminSesion', JSON.stringify({
                     nombre: nombre,
