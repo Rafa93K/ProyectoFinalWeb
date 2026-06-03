@@ -71,7 +71,7 @@ const PanelAdmin: React.FC = () => {
   const obtenerReservas = async (fechaSeleccionada: string) => {
     setCargandoReservas(true);
     try {
-      const respuesta = await fetch(`https://rafa.cicloflorenciopintado.es/getReservasAdmin.php?fecha=${fechaSeleccionada}`);
+      const respuesta = await fetch(`https://rafa.cicloflorenciopintado.es/api.php?action=getReservasAdmin&fecha=${fechaSeleccionada}`);
       const datos = await respuesta.json();
       setListaReservas(Array.isArray(datos) ? datos : []);
     } catch (error) {
@@ -90,7 +90,7 @@ const PanelAdmin: React.FC = () => {
     try {
       const formData = new FormData();
       formData.append('id_reserva', id.toString());
-      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/eliminarReserva.php', {
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=eliminarReserva', {
         method: 'POST',
         body: formData
       });
@@ -140,7 +140,7 @@ const PanelAdmin: React.FC = () => {
       formData.append('hora', datosReservaForm.hora);
       formData.append('mensaje', datosReservaForm.mensaje);
 
-      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/actualizarReserva.php', {
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=actualizarReserva', {
         method: 'POST',
         body: formData
       });
@@ -171,7 +171,7 @@ const PanelAdmin: React.FC = () => {
   const obtenerPuntuaciones = async () => {
     setCargando(true);
     try {
-      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/getProductos.php?tipo=all');
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=getProductos&tipo=all');
       const datos = await respuesta.json();
       if (Array.isArray(datos)) {
         // Ordenar por media de votos descendente. Manejar nulos como 0.
@@ -217,7 +217,7 @@ const PanelAdmin: React.FC = () => {
 
   const obtenerConfigAdmin = async () => {
     try {
-      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/getAdminConfig.php');
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=getAdminConfig');
       const datos = await respuesta.json();
       if (datos.success) {
         setMostrarEspeciales(datos.especials === 1 || datos.especials === true);
@@ -236,7 +236,7 @@ const PanelAdmin: React.FC = () => {
   const obtenerProductos = async () => {
     setCargando(true);
     try {
-      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/getProductos.php?tipo=all');
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=getProductos&tipo=all');
       const datos = await respuesta.json();
       setListaProductos(Array.isArray(datos) ? datos : []);
     } catch (error) {
@@ -251,7 +251,7 @@ const PanelAdmin: React.FC = () => {
     try {
       const formData = new FormData();
       formData.append('especials', nuevoEstado ? '1' : '0');
-      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/actualizarConfigAdmin.php', {
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=actualizarConfigAdmin', {
         method: 'POST',
         body: formData
       });
@@ -271,7 +271,7 @@ const PanelAdmin: React.FC = () => {
     try {
       const formData = new FormData();
       formData.append('id_producto', id.toString());
-      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/eliminarProducto.php', {
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=eliminarProducto', {
         method: 'POST',
         body: formData
       });
@@ -295,8 +295,8 @@ const PanelAdmin: React.FC = () => {
   e.preventDefault();
   try {
     const url = productoEditando 
-      ? 'https://rafa.cicloflorenciopintado.es/actualizarProducto.php' 
-      : 'https://rafa.cicloflorenciopintado.es/insertarProducto.php';
+      ? 'https://rafa.cicloflorenciopintado.es/api.php?action=actualizarProducto' 
+      : 'https://rafa.cicloflorenciopintado.es/api.php?action=insertarProducto';
 
     const formData = new FormData();
     if (productoEditando) formData.append('id_producto', productoEditando.id_producto.toString());

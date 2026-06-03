@@ -31,7 +31,7 @@ const AdminLogin: React.FC = () => {
             formData.append('contrasena', password);
 
             // Ajustar esta URL a la ruta real de tu backend
-            const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/loginAdmin.php', {
+            const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=loginAdmin', {
                 method: 'POST',
                 body: formData
             });
@@ -160,3 +160,4 @@ const AdminLogin: React.FC = () => {
 };
 
 export default AdminLogin;
+

@@ -105,7 +105,7 @@ const PanelUsuario: React.FC = () => {
     const obtenerReservas = async (telefono: string) => {
         setCargando(true);
         try {
-            const response = await fetch(`https://rafa.cicloflorenciopintado.es/getReservas.php?telefono=${telefono}`);
+            const response = await fetch(`https://rafa.cicloflorenciopintado.es/api.php?action=getReservas&telefono=${telefono}`);
             const data = await response.json();
             if (Array.isArray(data)) {
                 setReservas(data);
@@ -123,7 +123,7 @@ const PanelUsuario: React.FC = () => {
         setCargandoVotos(true);
         try {
             // Usamos getProductos.php que ya devuelve 'mi_puntuacion' si pasamos el id_usuario
-            const response = await fetch(`https://rafa.cicloflorenciopintado.es/getProductos.php?tipo=all&id_usuario=${idUsuario}`);
+            const response = await fetch(`https://rafa.cicloflorenciopintado.es/api.php?action=getProductos&tipo=all&id_usuario=${idUsuario}`);
             const data = await response.json();
             if (Array.isArray(data)) {
                 // Filtramos solo los que el usuario ha votado
@@ -164,7 +164,7 @@ const PanelUsuario: React.FC = () => {
             const formData = new FormData();
             formData.append('id_reserva', idAEliminar.toString());
 
-            const response = await fetch('https://rafa.cicloflorenciopintado.es/eliminarReserva.php', {
+            const response = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=eliminarReserva', {
                 method: 'POST',
                 body: formData
             });
@@ -209,7 +209,7 @@ const PanelUsuario: React.FC = () => {
             data.append('personas', formModificar.personas.toString());
             data.append('mensaje', formModificar.mensaje);
 
-            const response = await fetch('https://rafa.cicloflorenciopintado.es/actualizarReserva.php', {
+            const response = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=actualizarReserva', {
                 method: 'POST',
                 body: data
             });
@@ -506,3 +506,4 @@ const PanelUsuario: React.FC = () => {
 };
 
 export default PanelUsuario;
+

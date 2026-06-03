@@ -64,7 +64,7 @@ const Carta: React.FC = () => {
   // Obtiene la configuración del administrador (ej. si se muestran los especiales)
   const obtenerConfiguracion = async () => {
     try {
-      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/getAdminConfig.php');
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=getAdminConfig');
       const datos = await respuesta.json();
       if (datos.success) {
         setMostrarEspeciales(datos.especials === 1 || datos.especials === true);
@@ -79,7 +79,7 @@ const Carta: React.FC = () => {
     if (mostrarCarga) setCargando(true);
     try {
       const id_u = userId || usuario?.id_usuario || '';
-      const url = `https://rafa.cicloflorenciopintado.es/getProductos.php?tipo=${tipo}${id_u ? `&id_usuario=${id_u}` : ''}`;
+      const url = `https://rafa.cicloflorenciopintado.es/api.php?action=getProductos&tipo=${tipo}${id_u ? `&id_usuario=${id_u}` : ''}`;
       const respuesta = await fetch(url);
       const datos = await respuesta.json();
       setProductos(Array.isArray(datos) ? datos : []);
@@ -109,7 +109,7 @@ const Carta: React.FC = () => {
       formData.append('id_producto', id_producto.toString());
       formData.append('puntuacion', puntuacion.toString());
 
-      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/votar.php', {
+      const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=votar', {
         method: 'POST',
         body: formData
       });
@@ -340,3 +340,4 @@ const Carta: React.FC = () => {
 };
 
 export default Carta;
+

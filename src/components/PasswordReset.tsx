@@ -24,7 +24,7 @@ const PasswordReset: React.FC = () => {
             formData.append('token', token || '');
             formData.append('password', password);
 
-            const response = await fetch('https://rafa.cicloflorenciopintado.es/resetearPassword.php', {
+            const response = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=resetearPassword', {
                 method: 'POST',
                 body: formData
             });
@@ -101,3 +101,4 @@ const PasswordReset: React.FC = () => {
 };
 
 export default PasswordReset;
+

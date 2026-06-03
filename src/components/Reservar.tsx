@@ -124,7 +124,7 @@ export const Reservar: React.FC = () => {
                 } catch(e) {}
             }
 
-            const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/guardarReserva.php', {
+            const respuesta = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=guardarReserva', {
                 method: 'POST',
                 body: datosParaEnviar
             });
@@ -310,3 +310,4 @@ export const Reservar: React.FC = () => {
         </div>
     );
 };
+

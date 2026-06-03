@@ -18,7 +18,7 @@ const Login: React.FC = () => {
             formData.append('telefono', telefono);
             formData.append('contrasena', password);
 
-            const response = await fetch('https://rafa.cicloflorenciopintado.es/loginUsuario.php', {
+            const response = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=loginUsuario', {
                 method: 'POST',
                 body: formData
             });
@@ -101,3 +101,4 @@ const Login: React.FC = () => {
 };
 
 export default Login;
+

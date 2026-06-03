@@ -15,7 +15,7 @@ const PasswordOlvido: React.FC = () => {
             const formData = new FormData();
             formData.append('email', email);
 
-            const response = await fetch('https://rafa.cicloflorenciopintado.es/solicitarReseteo.php', {
+            const response = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=solicitarReseteo', {
                 method: 'POST',
                 body: formData
             });
@@ -87,3 +87,4 @@ const PasswordOlvido: React.FC = () => {
 };
 
 export default PasswordOlvido;
+

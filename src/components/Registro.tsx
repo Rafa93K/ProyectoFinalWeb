@@ -36,7 +36,7 @@ const Registro: React.FC = () => {
             formData.append('contrasena', datos.password);
             formData.append('confirmar_password', datos.confirmPassword);
 
-            const response = await fetch('https://rafa.cicloflorenciopintado.es/registroUsuario.php', {
+            const response = await fetch('https://rafa.cicloflorenciopintado.es/api.php?action=registroUsuario', {
                 method: 'POST',
                 body: formData
             });
@@ -165,3 +165,4 @@ const Registro: React.FC = () => {
 };
 
 export default Registro;
+
