@@ -48,7 +48,6 @@ const AdminLogin: React.FC = () => {
                 }));
                 
                 navegar('/adminF');
-                navegar('/adminF');
                 window.location.reload(); // Recargar para asegurar que el estado se actualiza
             } else {
                 setError(resultado.message || 'Credenciales incorrectas');
