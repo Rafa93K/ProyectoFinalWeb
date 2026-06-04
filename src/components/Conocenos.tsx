@@ -39,7 +39,10 @@ export const Conocenos = () => {
             <div className="absolute -right-10 -top-10 w-40 h-40 bg-[#D3CCBC]/10 rounded-full"></div>
 
             <h3 className="text-2xl font-bold mb-8 border-b border-[#D3CCBC]/20 pb-4 flex items-center gap-3">
-              <span className="text-3xl">🕒</span> Horario de Experiencias
+              <span className="text-3xl">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-16 h-16"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <rect width="40" height="40" rx="8" fill="#40403C" fillOpacity="0.6"></rect> <path d="M20 7.86667C13.2987 7.86667 7.86667 13.2987 7.86667 20C7.86667 26.7013 13.2987 32.1333 20 32.1333C26.7013 32.1333 32.1333 26.7013 32.1333 20C32.1333 13.2987 26.7013 7.86667 20 7.86667Z" fill="#D3CCBC"></path> <path d="M20 14.4C20.5155 14.4 20.9333 14.8179 20.9333 15.3333V20.0476L24.1225 22.8822C24.5078 23.2247 24.5425 23.8147 24.2 24.2C23.8575 24.5853 23.2675 24.62 22.8822 24.2775L19.0667 20.8857V15.3333C19.0667 14.8179 19.4845 14.4 20 14.4Z" fill="#595959"></path> </g></svg>
+              
+              </span> Horario
             </h3>
             <div className="space-y-4 text-lg">
               <div className="flex justify-between border-b border-[#D3CCBC]/10 pb-2">
@@ -100,3 +103,4 @@ export const Conocenos = () => {
     </main>
   );
 };
+

@@ -13,9 +13,12 @@ interface Producto {
   tipo: string;
   subtipo: string;
   imagen: string;
+  activo?: string | number | boolean;
   total_votos?: number | string;
   media_votos?: number | string;
 }
+
+type ProductoForm = Omit<Producto, 'id_producto'> & { activo: boolean };
 
 const PanelAdmin: React.FC = () => {
   const navegar = useNavigate();
@@ -45,13 +48,14 @@ const PanelAdmin: React.FC = () => {
     mensaje: ''
   });
 
-  const [datosFormulario, setDatosFormulario] = useState<Omit<Producto, 'id_producto'>>({
+  const [datosFormulario, setDatosFormulario] = useState<ProductoForm>({
     nombre: '',
     descripcion: '',
     precio: 0,
     tipo: 'carta',
     subtipo: 'carnes',
-    imagen: ''
+    imagen: '',
+    activo: true
   });
   const [archivoImagen, setArchivoImagen] = useState<File | null>(null);
 
@@ -306,6 +310,7 @@ const PanelAdmin: React.FC = () => {
     formData.append('precio', datosFormulario.precio.toString());
     formData.append('tipo', datosFormulario.tipo);
     formData.append('subtipo', datosFormulario.subtipo);
+    formData.append('activo', datosFormulario.activo ? '1' : '0');
     
     // --- LÓGICA CLAVE ---
     if (archivoImagen) {
@@ -333,14 +338,17 @@ const PanelAdmin: React.FC = () => {
  
   const abrirModalEdicion = (producto: Producto) => {
     setProductoEditando(producto);
-    setDatosFormulario({ ...producto });
+    setDatosFormulario({
+      ...producto,
+      activo: producto.activo !== undefined ? Boolean(Number(producto.activo)) : true
+    });
     setArchivoImagen(null);
     setModalAbierto(true);
   };
 
   const abrirModalCreacion = () => {
     setProductoEditando(null);
-    setDatosFormulario({ nombre: '', descripcion: '', precio: 0, tipo: 'carta', subtipo: 'carnes', imagen: '' });
+    setDatosFormulario({ nombre: '', descripcion: '', precio: 0, tipo: 'carta', subtipo: 'carnes', imagen: '', activo: true });
     setArchivoImagen(null);
     setModalAbierto(true);
   };
@@ -449,8 +457,18 @@ const PanelAdmin: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {productosVisibles.map((prod) => (
                   <div key={prod.id_producto} className="bg-[#E2DBC9] rounded-4xl overflow-hidden shadow-lg border border-white/40 group flex flex-col relative">
-                    <div className="relative h-56 overflow-hidden">
+                      <div className="relative h-56 overflow-hidden">
                       <img src={getImagePath(prod.imagen)} alt={prod.nombre} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                      {/* Indicador de estado: verde activo, rojo inactivo */}
+                      {(prod.activo === 1 || prod.activo === '1' || prod.activo === true) ? (
+                        <div className="absolute top-4 left-4">
+                          <span className="w-4 h-4 bg-green-500 rounded-full shadow-lg  block border-2 border-white/60" aria-hidden="true" />
+                        </div>
+                      ) : (
+                        <div className="absolute top-4 left-4">
+                          <span className="w-4 h-4 bg-red-500 rounded-full shadow-lg  block border-2 border-white/60" aria-hidden="true" />
+                        </div>
+                      )}
                       <div className="absolute top-4 right-4 flex flex-col gap-2">
                         <button onClick={() => abrirModalEdicion(prod)} className="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:bg-[#30312E] hover:text-[#D3CCBC]">
                           <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -579,7 +597,7 @@ const PanelAdmin: React.FC = () => {
                          <span className="block text-[10px] font-black text-stone-400 uppercase tracking-widest mb-1">Votos</span>
                          <span className="text-xl font-bold text-[#30312E]">{prod.total_votos || 0}</span>
                        </div>
-                       <div className="bg-[#30312E] text-[#D3CCBC] px-6 py-3 rounded-2xl flex flex-col items-center justify-center shadow-lg min-w-[100px]">
+                       <div className="bg-[#30312E] text-[#D3CCBC] px-6 py-3 rounded-2xl flex flex-col items-center justify-center shadow-lg min-w-25">
                          <span className="text-[10px] font-bold opacity-60 uppercase tracking-tighter">Media</span>
                          <div className="flex items-center gap-1">
                             <span className="text-2xl font-black">{prod.media_votos || '0.0'}</span>
@@ -605,6 +623,18 @@ const PanelAdmin: React.FC = () => {
                  <input type="number" placeholder="Precio" className="w-full p-2 rounded-lg bg-[#D3CCBC]" value={datosFormulario.precio} onChange={e => setDatosFormulario({...datosFormulario, precio: parseFloat(e.target.value)})} required />
                  <textarea placeholder="Descripción" className="w-full p-2 rounded-lg bg-[#D3CCBC]" value={datosFormulario.descripcion} onChange={e => setDatosFormulario({...datosFormulario, descripcion: e.target.value})} />
                  
+                 <div>
+                   <label className="block text-xs font-bold text-[#30312E] uppercase mb-1">Estado</label>
+                   <select
+                     className="w-full p-2 rounded-lg bg-[#D3CCBC] font-bold"
+                     value={datosFormulario.activo ? '1' : '0'}
+                     onChange={e => setDatosFormulario({...datosFormulario, activo: e.target.value === '1'})}
+                   >
+                     <option value="1">Activo</option>
+                     <option value="0">No activo</option>
+                   </select>
+                 </div>
+
                  <div className="flex gap-4">
                    <div className="flex-1">
                      <label className="block text-xs font-bold text-[#30312E] uppercase mb-1">Tipo</label>
@@ -720,7 +750,7 @@ const PanelAdmin: React.FC = () => {
       )}
       {/* MODAL DE CONFIRMACIÓN DE ELIMINACIÓN */}
       {confirmarEliminar && (
-        <div className="fixed inset-0 bg-[#30312E]/60 backdrop-blur-sm flex items-center justify-center p-4 z-[60] animate-fadeIn">
+        <div className="fixed inset-0 bg-[#30312E]/60 backdrop-blur-sm flex items-center justify-center p-4 z-60 animate-fadeIn">
           <div className="bg-[#E2DBC9] rounded-3xl p-8 max-w-sm w-full shadow-2xl border border-[#D3CCBC] transform animate-popIn">
             <div className="text-center">
               <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">

@@ -79,7 +79,7 @@ const Carta: React.FC = () => {
     if (mostrarCarga) setCargando(true);
     try {
       const id_u = userId || usuario?.id_usuario || '';
-      const url = `https://rafa.cicloflorenciopintado.es/getProductos.php?tipo=${tipo}${id_u ? `&id_usuario=${id_u}` : ''}`;
+      const url = `https://rafa.cicloflorenciopintado.es/getProductos.php?tipo=${tipo}&activo=1${id_u ? `&id_usuario=${id_u}` : ''}`;
       const respuesta = await fetch(url);
       const datos = await respuesta.json();
       setProductos(Array.isArray(datos) ? datos : []);
